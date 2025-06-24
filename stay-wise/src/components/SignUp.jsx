@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import './SignUp.css'; // External CSS for styling
+import './SignUp.css';
 
 export function Signup() {
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ export function Signup() {
 
     localStorage.setItem('user', JSON.stringify(formData));
 
-    navigate('/');
+    navigate('/decision');
 };
 
     const handleCancel = () => {
