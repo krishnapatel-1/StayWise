@@ -12,10 +12,12 @@ function Decision(){
     }
 
     return(
-        <div>
-            <h1>Who are You?</h1>
-            <button onClick={owner}>Owner</button>
-            <button onClick={tenant}>Tenant</button>
+        <div class="decision-box">
+            <h1 class="content">Who are You?</h1>
+            <div class="button-group">
+                <button class="button1" onClick={owner}>Owner</button>
+                <button class="button1" onClick={tenant}>Tenant</button>
+            </div>
         </div>
 
     );
