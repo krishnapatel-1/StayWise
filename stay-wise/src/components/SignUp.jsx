@@ -16,13 +16,39 @@ export function Signup() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
-    e.preventDefault();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    localStorage.setItem('user', JSON.stringify(formData));
+        try {
+            const res = await fetch("http://localhost:5000/api/users/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: formData.fullName,
+                    email: formData.email,
+                    password: formData.password,
+                    mobile: formData.mobile, 
+                    role: "customer"
+                })
+            });
 
-    navigate('/decision');
-};
+            const data = await res.json();
+
+            if (res.ok) {
+                alert(data.message);
+                localStorage.setItem('user', JSON.stringify(formData));
+                navigate('/decision');
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error("Signup error:", error);
+            alert("Something went wrong. Please try again.");
+        }
+    };
+
 
     const handleCancel = () => {
         navigate('/');

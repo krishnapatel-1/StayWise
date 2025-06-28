@@ -1,33 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import './Profile.css';
 
 function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [req,setReq]= useState(null);
+  const [req, setReq] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedReq = localStorage.getItem('req');
-
-    if(storedReq){
-      setReq(JSON.parse(storedReq));
-    }else{
-      console.log("No req made");
-    }
+    const storedReq = localStorage.getItem("req");
 
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
       navigate("/login");
     }
+
+    if (storedReq) {
+      setReq(JSON.parse(storedReq));
+    } else {
+      console.log("No requirements made");
+    }
   }, [navigate]);
 
-  const home = () => {
+  const handleHome = () => {
     navigate("/home");
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
   };
@@ -37,24 +38,34 @@ function Profile() {
   }
 
   return (
-    <div>
+    <div className="profile-wrapper">
+      <div className="profile-container">
         <h1>Profile</h1>
-        <p><strong>Full Name:</strong> {user.fullName}</p>
-        <p><strong>Mobile Number:</strong> {user.mobile}</p>
-        <p><strong>Email:</strong> {user.email}</p>
 
-        <h2>Requirments</h2>
-        <p>Location:{req.location}</p>
-        <p>Duration: {req.duration}</p>
-        <p>Range: {req.range}</p>
-        <p>Category: {req.category}</p>
+        <div className="profile-info">
+          <p><strong>Full Name:</strong> {user.fullName}</p>
+          <p><strong>Mobile Number:</strong> {user.mobile}</p>
+          <p><strong>Email:</strong> {user.email}</p>
+        </div>
 
-      <button onClick={home}>Home</button>
-      <button onClick={logout}>Log Out</button>
+        {req && (
+          <div className="requirements-section">
+            <h2>Requirements</h2>
+            <p><strong>Location:</strong> {req.location}</p>
+            <p><strong>Duration:</strong> {req.duration}</p>
+            <p><strong>Range:</strong> {req.range}</p>
+            <p><strong>Category:</strong> {req.category}</p>
+          </div>
+        )}
 
-      
+        <div className="button-group">
+          <button onClick={handleHome}>Home</button>
+          <button onClick={handleLogout}>Log Out</button>
+        </div>
+      </div>
     </div>
   );
+
 }
 
 export default Profile;

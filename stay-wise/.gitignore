@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+staywise-backend/node_modules/
+node_modules
+staywise-backend/.env
