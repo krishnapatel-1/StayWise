@@ -7,6 +7,7 @@ import { Signup } from './components/SignUp';
 import Decision from './components/DecisionPage';
 import { Owner } from './components/OwnerPage';
 import { Login } from './components/LogIn';
+import Rooms from './components/Rooms';
 import './App.css';
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/decision" element={<Decision />} />
         <Route path="/owner" element={<Owner />} />
-
+        <Route path="/rooms" element={<Rooms/>}/>
         <Route path="*" element={<LandingPage />} />
       </Routes>
     </Router>
