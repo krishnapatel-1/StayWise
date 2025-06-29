@@ -234,7 +234,17 @@ h1 {
   place-items: center;
 };
 
+.details{
+  display: grid;
+  justify-content: center;
+  gap: 10px;
+}
 
+.big-photo{
+  background-color: red;
+  width: 400px;
+  height: 500px;
+}
 
 .container{
   display: flex;
@@ -316,6 +326,7 @@ button {
   transform: scale(1.05);
 
 }
+
 .manage-room{
   width: 1200px;
   height: auto;
@@ -334,7 +345,7 @@ button {
   width: 300px;
   height: 200px;
   border-radius: 15%;
-  background-color: #0f172a;
+  background-color: white;
   border-radius: 10%;
   padding: 40px;
   display: flex;
@@ -347,6 +358,32 @@ button {
 .photo:hover{
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
+}
+
+.room-nbox{
+  flex: '0 0 calc(33.33% - 16px)';
+  background-color:#03A6A1;
+  border: '1px solid gray';
+  box-sizing: 'border-box';
+  display: grid;
+  place-content: center;
+  height: 350px;
+  width: 350px;
+  padding: 40px;
+  border-radius: 5%;
+}
+
+.room-nbox:hover{
+  transform: scale(1.03);
+
+}
+.rooms-collection{
+  border-radius: 10%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 30px;
+  gap: 30px;
 }
 
 .room{
