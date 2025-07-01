@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import dotenv from 'dotenv';
 import './SignUp.css';
 
 export function Signup() {
@@ -20,7 +21,7 @@ export function Signup() {
         e.preventDefault();
 
         try {
-            const res = await fetch("http://localhost:5000/api/users/register", {
+            const res = await fetch(`http://localhost:4000/api/users/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -31,7 +32,8 @@ export function Signup() {
                     password: formData.password,
                     mobile: formData.mobile, 
                     role: "customer"
-                })
+                }),
+                credentials: 'include'
             });
 
             const data = await res.json();

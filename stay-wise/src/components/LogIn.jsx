@@ -15,7 +15,7 @@ export function Login() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/login", {
+      const res = await fetch("http://localhost:4000/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

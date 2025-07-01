@@ -8,6 +8,8 @@ import Decision from './components/DecisionPage';
 import { Owner } from './components/OwnerPage';
 import { Login } from './components/LogIn';
 import Rooms from './components/Rooms';
+import Matched from './components/MatchedRoom';
+import Selected from './components/SelectedRoom';
 import './App.css';
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
         <Route path="/decision" element={<Decision />} />
         <Route path="/owner" element={<Owner />} />
         <Route path="/rooms" element={<Rooms/>}/>
+        <Route path="/matched" element={<Matched/>}/>
+        <Route path="/selected" element={<Selected/>}/>
         <Route path="*" element={<LandingPage />} />
       </Routes>
     </Router>
