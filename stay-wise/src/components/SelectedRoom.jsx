@@ -1,18 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { useState,useEffect} from "react";
 
 function Selected(){
-    const [fixed,setFixed]=useState(0);
     const [index,setIndex]=useState(0);
     const [matched,setMatched]=useState(null);
-    const [rooms,setRooms]=useState(null);
     const navigate=useNavigate();
-    
+    const lcn=useLocation();
+
+    useEffect(() => {
+      
+      const fixed = lcn.state?.index;
+      setIndex(fixed);
+    }, [location.state,index]);
+
     useEffect(()=>{
         const storedMatch=localStorage.getItem('matched');
-        const storeFixed=localStorage.getItem('fixed');
-        const storedIndex=localStorage.getItem('index');
-        const storedRooms=localStorage.getItem('rooms');
+        //const storedIndex=localStorage.getItem('index');
 
         if(storedMatch){
         setMatched(JSON.parse(storedMatch));
@@ -20,26 +23,14 @@ function Selected(){
             navigate("/rooms");
         }
 
-        if(storedRooms){
-        setRooms(JSON.parse(storedRooms));
-        }else{
-            navigate("/rooms");
-        }
-
-        if(storeFixed){
-        setFixed(JSON.parse(storeFixed));
-        }else{
-            navigate("/rooms");
-        }
-
-        if(storedIndex){
+        /*if(storedIndex){
             setIndex(JSON.parse(storedIndex));
         }else{
             navigate('/rooms');
-        }
-    },[]);
+        }*/
+    },[matched]);
 
-    if (!matched||!rooms) return <div>Loading...</div>;
+    if (!matched) return <div>Loading...</div>;
 
     const gotoprof=()=>{
         navigate('/profile')
@@ -49,8 +40,8 @@ function Selected(){
       navigate('/home')
     }
 
-    const handleClick = (e,index)=>{
-        alert("Request Sent")
+    const handleClick = ()=>{
+      alert("Request Sent")
       navigate('/home');
     }
 
@@ -77,16 +68,15 @@ function Selected(){
         <div>
             <h1>ROOM SELECTED HERE {index+1}</h1>
             
-
-            {!index && matched?.length>0?(
+            {matched?.length>0?(
             <div>
-                <div className="decision-box">Room no. {fixed+1}</div>
+                <div className="decision-box">Room no. {index+1}</div>
                 <div className="details">
                     <h2>Details about the selected room</h2>
-                    <h2><strong>Location :</strong>{matched[fixed].location}</h2>
-                    <p><strong>Range :</strong>{matched[fixed].range}</p>
-                    <p><strong>Duration :</strong>{matched[fixed].duration}</p>
-                    <p><strong>Category :</strong>{matched[fixed].category}</p>
+                    <h2><strong>Location :</strong>{matched[index].location}</h2>
+                    <p><strong>Range :</strong>{matched[index].range}</p>
+                    <p><strong>Duration :</strong>{matched[index].duration}</p>
+                    <p><strong>Category :</strong>{matched[index].category}</p>
                     <button onClick={handleClick}>Send Message</button>
                 </div>
             </div>):(<p></p>)}
