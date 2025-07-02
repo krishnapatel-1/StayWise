@@ -36,7 +36,8 @@ function Matched(){
     ]
 
     const [selectedIndex,setSelectedIndex]=useState(0);
-    const [fixed,setFixed]=useState(0);
+    const [fixed,setFixed]=useState(-1);
+    //const [index,setIndex]=useState();
     const [req,setReq]=useState(null);
 
     const navigate=useNavigate();
@@ -49,6 +50,12 @@ function Matched(){
             navigate("/home");
         }
     },[]);
+
+    useEffect(() => {
+        if (fixed !== -1) {
+          navigate("/selected", { state: {index: fixed } });
+        }
+      }, [fixed]);
 
     if (!req) return <div>Loading...</div>;
 
@@ -71,8 +78,7 @@ function Matched(){
     const handleClick = (e,index)=>{
       e.preventDefault();
       setFixed(index);
-      localStorage.setItem('fixed',JSON.stringify(fixed));
-      navigate('/selected')
+      //localStorage.setItem('index',JSON.stringify(fixed));
     }
 
     const showrooms=()=>{
