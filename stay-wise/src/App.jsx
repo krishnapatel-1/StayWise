@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './components/HomePage';
 import Profile from './components/Profile';
 import LandingPage from './components/LandingPage';
-import { Signup } from './components/SignUp';
+import { CustomerSignup } from './components/customerSignUp';
 import Decision from './components/DecisionPage';
 import { Owner } from './components/OwnerPage';
 import { Login } from './components/LogIn';
@@ -19,7 +19,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/home" element={<Home />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/customerSignup" element={<CustomerSignup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/decision" element={<Decision />} />

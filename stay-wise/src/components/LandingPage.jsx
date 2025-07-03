@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom'
-import {Signup} from './SignUp'
+import {CustomerSignup} from './customerSignUp'
 import {Login} from './LogIn'
 import './LandingPage.css';
 
@@ -9,7 +9,7 @@ function LandingPage() {
       <div className="landing-card">
         <h1>StayWise</h1>
         <div className="landing-buttons">
-          <Link to="/signup" className="landing-btn">Sign Up</Link>
+          <Link to="/customerSignup" className="landing-btn">Sign Up</Link>
           <Link to="/login" className="landing-btn">Log In</Link>
         </div>
       </div>

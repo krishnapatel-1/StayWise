@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import dotenv from 'dotenv';
-import './SignUp.css';
+import './customerSignUp.css';
 
-export function Signup() {
+export function CustomerSignup() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: '',
