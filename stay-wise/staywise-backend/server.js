@@ -2,12 +2,13 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js"; 
+import ownerRoutes from "./routes/ownerRoutes.js";
 import dotenv from "dotenv"; 
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT|4000;
 console.log(PORT);
 
 app.use(cors({
@@ -22,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRoutes);
+app.use("/api/owners", ownerRoutes);
 
 
 

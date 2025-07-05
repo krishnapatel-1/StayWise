@@ -1,21 +1,53 @@
 import { useNavigate } from "react-router-dom";
+import { useState,useEffect} from "react";
 
-export function Owner(){
+function Owner(){
     const navigate=useNavigate();
 
-    const back = () =>{
-        navigate('/');
+    const gotoprof=()=>{
+        navigate('/ownprof')
     }
 
-    const profile = () =>{
-        navigate('/profile');
+    const handleHome =()=>{
+      navigate('/owner')
     }
 
-    return(
+    const handleCreate=()=>{
+
+    }
+
+    const handleView=()=>{
+
+    }
+
+    return (
+    <div className="home-page">
+      <nav className="navbar">
+        <h2 onClick={handleHome}>StayWise</h2>
+        <input type="text" placeholder="Search..." className="search-input" />
         <div>
-            <h1>Owner Journey Yet to be decided</h1>
-            <button onClick={back}>Back</button>
-            <button onClick={profile}>Profile</button>
+        <button className="profile-btn" onClick={gotoprof}>Profile</button>
         </div>
-    );
+      </nav>
+
+      <div className="home-content">
+        <h1>Welcome to StayWise</h1>
+        <p>Get Tenants without any effort</p>
+      </div>
+        
+        <div className="manage-room">
+              <div className="own-box">
+                <div className="btn-own">
+                    <button onClick={handleCreate}>Create Property</button>
+                    <button onClick={handleView}>View Your Property</button>
+                </div>
+                <div className="owner-dash">
+                    <h2>DashBoard</h2>
+                </div>
+              </div>
+        </div>
+    </div>
+  );
 }
+
+export default Owner;

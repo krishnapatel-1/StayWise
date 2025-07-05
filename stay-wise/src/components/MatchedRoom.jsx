@@ -78,7 +78,6 @@ function Matched(){
     const handleClick = (e,index)=>{
       e.preventDefault();
       setFixed(index);
-      //localStorage.setItem('index',JSON.stringify(fixed));
     }
 
     const showrooms=()=>{

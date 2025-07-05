@@ -10,6 +10,7 @@ function LandingPage() {
         <h1>StayWise</h1>
         <div className="landing-buttons">
           <Link to="/customerSignup" className="landing-btn">Sign Up</Link>
+          <Link to="/ownerSignup" className="landing-btn">Owner Sign Up</Link>
           <Link to="/login" className="landing-btn">Log In</Link>
         </div>
       </div>

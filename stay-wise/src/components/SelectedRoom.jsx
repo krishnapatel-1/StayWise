@@ -15,19 +15,12 @@ function Selected(){
 
     useEffect(()=>{
         const storedMatch=localStorage.getItem('matched');
-        //const storedIndex=localStorage.getItem('index');
 
         if(storedMatch){
         setMatched(JSON.parse(storedMatch));
         }else{
             navigate("/rooms");
         }
-
-        /*if(storedIndex){
-            setIndex(JSON.parse(storedIndex));
-        }else{
-            navigate('/rooms');
-        }*/
     },[matched]);
 
     if (!matched) return <div>Loading...</div>;

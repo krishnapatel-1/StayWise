@@ -420,6 +420,53 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+
+/* OWNER PAGE STYLING */
+
+.own-box{
+  width: 1200px;
+  height: auto;
+  padding: 10px;
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  background-color: #012525;
+  gap: 90px;
+}
+
+.btn-own{
+  display: grid;
+  place-content: center;
+  gap: 60px;
+  padding: 70px;
+}
+
+.btn-own button{
+  height: 70px;
+  weight: 500px;
+  font-size: large;
+  background-color: #03A6A1; 
+}
+
+.owner-dash{
+  height: 600px;
+  width: 500px;
+  background-color: #03A6A1;
+  border-radius: 5%;
+}
+
+.owner-dash h2{
+  padding: 30px;
+}
+
+
+
+
+/* OWNER STYLING ENDS */
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

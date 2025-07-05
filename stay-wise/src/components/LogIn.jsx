@@ -22,11 +22,16 @@ export function Login() {
       });
 
       const data = await res.json();
-
       if (res.ok) {
         alert("Login successful");
+        console.log(data.role);
         localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/decision");
+        if(data.user.role === 'owner'){
+          navigate('/owner');
+        }
+        if(data.user.role === 'customer') {
+          navigate('/home');
+        }
       } else {
         alert(data.message);
       }
