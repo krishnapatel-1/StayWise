@@ -1,21 +1,15 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-import userRoutes from "./routes/userRoutes.js";
-import photoRoutes from "./routes/photoRoutes.js";
-import propertyRoutes from "./routes/propertyRoutes.js";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const Grid = require("gridfs-stream");
-
+import userRoutes from "./routes/userRoutes.js"; 
+import dotenv from "dotenv"; 
+import Grid from 'gridfs-stream';
+const conn = mongoose.connection;
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-app.use(express.json({ limit: '10mb' }));
+const PORT = process.env.PORT |4000;
+console.log(PORT);
 
 // Enable CORS and JSON parsing
 app.use(cors({
@@ -31,8 +25,6 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/users", userRoutes);
-app.use("/api/photos", photoRoutes); // 📸 photo upload route
-app.use("/api/properties", propertyRoutes);
 
 // MongoDB + GridFS setup
 let gfs;

@@ -165,7 +165,7 @@ const GeneralSection = ({ formData, setFormData, onNext, onBack }) => {
       </select>
 
       <div className="navigation-buttons">
-        <button type="button" onClick={onBack} disabled>Back</button>
+        <button type="button" onClick={onBack}>Back</button>
         <button type="button" onClick={onNext}>Next</button>
       </div>
     </div>

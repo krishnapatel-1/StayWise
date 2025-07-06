@@ -15,6 +15,33 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
     setImages(prev => ({ ...prev, [fieldName]: file }));
   };
 
+  useEffect(() => {
+  if (formData.propertyType === 'house') {
+    const floorDetails = formData.houseFloorDetails || [];
+    const labels = [];
+
+    floorDetails.forEach((floor, index) => {
+      for (let i = 1; i <= Number(floor.bedrooms || 0); i++) {
+        labels.push(`Floor ${index + 1} - Bedroom ${i}`);
+      }
+      for (let i = 1; i <= Number(floor.bathrooms || 0); i++) {
+        labels.push(`Floor ${index + 1} - Bathroom ${i}`);
+      }
+      for (let i = 1; i <= Number(floor.kitchens || 0); i++) {
+        labels.push(`Floor ${index + 1} - Kitchen ${i}`);
+      }
+      for (let i = 1; i <= Number(floor.halls || 0); i++) {
+        labels.push(`Floor ${index + 1} - Hall ${i}`);
+      }
+      for (let i = 1; i <= Number(floor.balconies || 0); i++) {
+        labels.push(`Floor ${index + 1} - Balcony ${i}`);
+      }
+    });
+
+    setRequiredLabels(labels);
+  }
+}, [formData.houseFloorDetails, formData.propertyType]);
+
   const renderImageInput = (label) => (
     <div key={label} className="photo-upload-field">
       <label>{label}</label>
@@ -70,9 +97,48 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
       );
     });
 
-    setRequiredLabels(labels);
+    //setRequiredLabels(labels);
     return inputs;
   };
+
+    useEffect(() => {
+    if (formData.propertyType !== 'house') {
+      const type = formData.propertyType?.toLowerCase();
+      const fields = [];
+
+      switch (type) {
+        case 'single room':
+          fields.push('Room', 'Bathroom');
+          break;
+        case 'double room':
+          fields.push('Room 1', 'Room 2', 'Bathroom');
+          break;
+        case '1bhk':
+          fields.push('Bedroom', 'Bathroom', 'Kitchen', 'Hall');
+          break;
+        case '2bhk':
+          fields.push('Bedroom 1', 'Bedroom 2', 'Bathroom 1', 'Bathroom 2', 'Kitchen', 'Hall');
+          break;
+        case '3bhk':
+          fields.push('Bedroom 1', 'Bedroom 2', 'Bedroom 3', 'Bathroom 1', 'Bathroom 2', 'Bathroom 3', 'Kitchen', 'Hall');
+          break;
+        case 'pg room':
+        case 'hostel room':
+          fields.push('Room', 'Bathroom');
+          break;
+        default:
+          fields.push('Property');
+          break;
+      }
+
+      const balconyCount = parseInt(formData.balconyCount || 0);
+      for (let i = 1; i <= balconyCount; i++) {
+        fields.push(`Balcony ${i}`);
+      }
+
+      setRequiredLabels(fields);
+    }
+  }, [formData.propertyType, formData.balconyCount]);
 
   const renderStandardPropertyPhotos = () => {
     const type = formData.propertyType?.toLowerCase();
@@ -108,7 +174,7 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
       fields.push(`Balcony ${i}`);
     }
 
-    setRequiredLabels(fields);
+    //setRequiredLabels(fields);
     return fields.map(label => renderImageInput(label));
   };
 

@@ -183,13 +183,14 @@ h1 {
 
 .cust-form {
   background-color:  #03A6A1;
-  padding: 20px;
-  border-radius: 15%;
+  padding: 30px;
+  border-radius: 10%;
   width: auto;
   height: 76vh;
   display: grid;
   place-items: center;
   gap: 50px;
+  margin: 0px 80px 0px 80px;
 }
 
 .cust-form input{
@@ -419,6 +420,89 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+
+/* OWNER PAGE STYLING */
+
+.own-box{
+  width: 1200px;
+  height: auto;
+  padding: 20px;
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  background-color: #012525;
+  gap: 90px;
+}
+
+.btn-own{
+  display: grid;
+  place-content: center;
+  gap: 60px;
+  padding: 70px;
+}
+
+.btn-own button{
+  height: 70px;
+  weight: 500px;
+  font-size: large;
+  background-color: #03A6A1; 
+}
+
+.owner-dash{
+  height: 600px;
+  width: 500px;
+  background-color: #03A6A1;
+  border-radius: 5%;
+}
+
+.owner-dash h2{
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+/* OWNER STYLING ENDS */
+
+
+/* PROPERTY STYLING*/
+
+.prop-box{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prop-container{
+  display: grid;
+  gap:80px;
+}
+
+.prox-box1{
+  display: grid;
+  justify-content: center;  
+}
+
+.tx{
+  font-size: xx-large;
+  margin: 0px 120px 30px 120px;
+
+}
+
+.prop-collection{
+  border-radius: 5%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+  gap: 30px;
+  margin: 0px 90px 0px 90px;
+  background-color: #012525;
+}
+
+/* PROPERTY ENDS */
 
 @media (prefers-color-scheme: light) {
   :root {
