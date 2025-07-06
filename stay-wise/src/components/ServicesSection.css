@@ -1,0 +1,41 @@
+.section-container {
+  padding: 20px;
+}
+
+.service-item {
+  margin-bottom: 20px;
+}
+
+.service-item label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.timing-group {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.timing-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.clickable-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+.clickable-label input[type="checkbox"] {
+  margin-left: 10px;
+  cursor: pointer;
+}
