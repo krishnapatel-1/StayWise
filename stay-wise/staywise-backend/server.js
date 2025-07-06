@@ -3,11 +3,12 @@ import mongoose from "mongoose";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js"; 
 import dotenv from "dotenv"; 
-
+import Grid from 'gridfs-stream';
+const conn = mongoose.connection;
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT |4000;
 console.log(PORT);
 
 // Enable CORS and JSON parsing

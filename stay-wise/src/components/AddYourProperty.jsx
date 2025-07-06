@@ -7,11 +7,13 @@ import ServiceSection from './ServiceSection';
 import LocationSection from './LocationSection';
 import PricingSection from './PricingSection';
 import FinalSection from './FinalSection';
+import { useNavigate } from 'react-router-dom';
 import './AddYourProperty.css';
 
 const AddYourProperty = () => {
   const [formData, setFormData] = useState({});
   const [currentSection, setCurrentSection] = useState(0);
+  const navigate=useNavigate();
 
   const sections = [
     'general',
@@ -38,7 +40,14 @@ const AddYourProperty = () => {
 
   const handleBack = () => {
     // If coming from location to facilities and property is not PG/hostel, skip services
-    if (
+    if(
+      sections[currentSection] === 'general'
+    ) {
+      if (window.confirm("Are you sure you want to go back home? Unsaved data may be lost.")) {
+        navigate('/owner');
+      }
+      return;
+    } else if (
       sections[currentSection] === 'location' &&
       !(formData.propertyType === 'pg room' || formData.propertyType === 'hostel room')
     ) {
@@ -46,6 +55,7 @@ const AddYourProperty = () => {
     } else {
       setCurrentSection((prev) => Math.max(prev - 1, 0));
     }
+  
   };
 
   const renderSection = () => {
@@ -56,6 +66,7 @@ const AddYourProperty = () => {
             formData={formData}
             setFormData={setFormData}
             onNext={handleNext}
+            onBack={handleBack}
           />
         );
       case 'photos':

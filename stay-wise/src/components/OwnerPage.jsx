@@ -13,11 +13,11 @@ function Owner(){
     }
 
     const handleCreate=()=>{
-
+        navigate('/add-property')
     }
 
     const handleView=()=>{
-
+        navigate('/my-property')
     }
 
     return (
@@ -35,7 +35,7 @@ function Owner(){
         <p>Get Tenants without any effort</p>
       </div>
         
-        <div className="manage-room">
+        <div className="prop-box">
               <div className="own-box">
                 <div className="btn-own">
                     <button onClick={handleCreate}>Create Property</button>
