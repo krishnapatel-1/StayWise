@@ -1,7 +1,38 @@
 import React from "react";
 import './FinalSection.css';
 
+
+
 const FinalSection = ({ formData, onBack, onSubmit }) => {
+  const navigate = useNavigate();
+
+  const handleFinalSubmit = async () => {
+    const ownerId = localStorage.getItem("ownerId");
+
+    try {
+      const response = await fetch("http://localhost:5000/api/property/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, ownerId }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Property submitted successfully!");
+        onSubmit(); // ⬅️ trigger your original onSubmit flow (reset + redirect)
+      } else {
+        console.error("❌ Submission error:", data.message);
+        alert("Submission failed!");
+      }
+    } catch (err) {
+      console.error("❌ Network error:", err);
+      alert("An error occurred during submission!");
+    }
+  };
+
   const {
     propertyType = "",
     furnishing,
@@ -132,7 +163,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       {/* Navigation */}
       <div className="navigation-buttons" style={{ marginTop: "20px" }}>
         <button onClick={onBack}>Back</button>
-        <button onClick={onSubmit}>Submit</button>
+        <button onClick={handleFinalSubmit}>Submit</button>
       </div>
     </div>
   );
