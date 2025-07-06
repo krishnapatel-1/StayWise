@@ -3,6 +3,8 @@ import './PhotoSection.css';
 
 const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
   const [images, setImages] = useState({});
+  const [requiredLabels, setRequiredLabels] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     setFormData(prev => ({ ...prev, photos: images }));
@@ -25,36 +27,51 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
 
   const renderHouseFloorPhotos = () => {
     const floorDetails = formData.houseFloorDetails || [];
-    return floorDetails.map((floor, index) => {
-      const inputs = [];
+    const labels = [];
+
+    const inputs = floorDetails.map((floor, index) => {
+      const fields = [];
 
       for (let i = 1; i <= Number(floor.bedrooms || 0); i++) {
-        inputs.push(renderImageInput(`Floor ${index + 1} - Bedroom ${i}`));
+        const label = `Floor ${index + 1} - Bedroom ${i}`;
+        fields.push(renderImageInput(label));
+        labels.push(label);
       }
 
       for (let i = 1; i <= Number(floor.bathrooms || 0); i++) {
-        inputs.push(renderImageInput(`Floor ${index + 1} - Bathroom ${i}`));
+        const label = `Floor ${index + 1} - Bathroom ${i}`;
+        fields.push(renderImageInput(label));
+        labels.push(label);
       }
 
       for (let i = 1; i <= Number(floor.kitchens || 0); i++) {
-        inputs.push(renderImageInput(`Floor ${index + 1} - Kitchen ${i}`));
+        const label = `Floor ${index + 1} - Kitchen ${i}`;
+        fields.push(renderImageInput(label));
+        labels.push(label);
       }
 
       for (let i = 1; i <= Number(floor.halls || 0); i++) {
-        inputs.push(renderImageInput(`Floor ${index + 1} - Hall ${i}`));
+        const label = `Floor ${index + 1} - Hall ${i}`;
+        fields.push(renderImageInput(label));
+        labels.push(label);
       }
 
       for (let i = 1; i <= Number(floor.balconies || 0); i++) {
-        inputs.push(renderImageInput(`Floor ${index + 1} - Balcony ${i}`));
+        const label = `Floor ${index + 1} - Balcony ${i}`;
+        fields.push(renderImageInput(label));
+        labels.push(label);
       }
 
       return (
         <div key={`floor-${index}`} className="floor-photo-section">
           <h3>Floor {index + 1}</h3>
-          {inputs}
+          {fields}
         </div>
       );
     });
+
+    setRequiredLabels(labels);
+    return inputs;
   };
 
   const renderStandardPropertyPhotos = () => {
@@ -91,19 +108,67 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
       fields.push(`Balcony ${i}`);
     }
 
+    setRequiredLabels(fields);
     return fields.map(label => renderImageInput(label));
+  };
+
+  const handleNextClick = async () => {
+    const missing = requiredLabels.filter(label => !images[label]);
+    if (missing.length > 0) {
+      alert(`Please upload all required photos:\n${missing.join(', ')}`);
+      return;
+    }
+
+    setUploading(true);
+    const uploadedPhotoIds = {};
+    const ownerId = localStorage.getItem("ownerId");
+
+    for (const [label, file] of Object.entries(images)) {
+      const photoForm = new FormData();
+      photoForm.append("file", file);
+      photoForm.append("ownerId", ownerId);
+      photoForm.append("label", label);
+
+      try {
+        const res = await fetch("http://localhost:5000/api/photos/upload", {
+          method: "POST",
+          body: photoForm,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          uploadedPhotoIds[label] = data.fileId;
+        } else {
+          console.error("Upload error:", data.message);
+        }
+      } catch (error) {
+        console.error("Error uploading photo:", label, error);
+      }
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      photos: uploadedPhotoIds,
+    }));
+
+    setUploading(false);
+    onNext();
   };
 
   return (
     <div className="photo-section">
       <h2>Photo Upload</h2>
+
       {formData.propertyType === 'house'
         ? renderHouseFloorPhotos()
         : renderStandardPropertyPhotos()}
 
       <div className="navigation-buttons">
         <button onClick={onBack}>Back</button>
-        <button onClick={onNext}>Next</button>
+        <button onClick={handleNextClick} disabled={uploading}>
+          {uploading ? "Uploading..." : "Next"}
+        </button>
       </div>
     </div>
   );
