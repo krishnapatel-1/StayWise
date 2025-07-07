@@ -24,9 +24,10 @@ export function Login() {
       const data = await res.json();
       if (res.ok) {
         alert("Login successful");
-        console.log(data.role);
         localStorage.setItem("user", JSON.stringify(data.user));
         if(data.user.role === 'owner'){
+          console.log(data.user._id);
+          localStorage.setItem("ownerId", JSON.stringify(data.user._id));
           navigate('/owner');
         }
         if(data.user.role === 'customer') {

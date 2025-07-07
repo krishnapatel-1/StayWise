@@ -196,7 +196,7 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
       photoForm.append("label", label);
 
       try {
-        const res = await fetch("http://localhost:5000/api/photos/upload", {
+        const res = await fetch("http://localhost:4000/api/photos/upload", {
           method: "POST",
           body: photoForm,
         });
