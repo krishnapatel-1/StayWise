@@ -122,9 +122,8 @@ const PhotoSection = ({ formData, setFormData, onBack, onNext }) => {
       alert(`Please upload all required photos:\n${missing.join(', ')}`);
       return;
     }
-
-    console.log("✅ Images ready for FinalSection:", images);
-    onNext(); // FinalSection will submit everything
+    // console.log("✅ Images ready for FinalSection:", images);
+    onNext();
   };
 
   return (

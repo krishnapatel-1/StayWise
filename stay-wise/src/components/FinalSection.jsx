@@ -7,6 +7,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
 
   const handleFinalSubmit = async () => {
     const ownerId = localStorage.getItem("ownerId");
+
     if (!ownerId) {
       alert("❌ Owner ID not found. Please log in again.");
       return;
@@ -84,6 +85,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
         alert("✅ Property submitted successfully!");
         onSubmit(); // Reset + redirect
       } else {
+        console.log(data.user._id)
         console.error("❌ Submission error:", data.message);
         alert("Submission failed!");
       }

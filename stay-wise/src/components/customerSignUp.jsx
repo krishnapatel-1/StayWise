@@ -8,7 +8,8 @@ export function CustomerSignup() {
         fullName: '',
         mobile: '',
         email: '',
-        password: ''
+        password: '',
+        role: ''
     });
 
     const handleChange = (e) => {
@@ -18,6 +19,11 @@ export function CustomerSignup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (formData.role === "") {
+            alert("Please select your identity (Customer or Owner).");
+            return;
+        }
 
         try {
             const res = await fetch(`http://localhost:4000/api/users/register`, {
@@ -30,20 +36,31 @@ export function CustomerSignup() {
                     email: formData.email,
                     password: formData.password,
                     mobile: formData.mobile, 
-                    role: "customer"
+                    role: formData.role
                 }),
                 credentials: 'include'
             });
 
             const data = await res.json();
+            console.log("📦 Backend response:", data);
 
-            if (res.ok) {
+            if (res.ok && data.user) {
                 alert(data.message);
-                localStorage.setItem('user', JSON.stringify(formData));
-                navigate('/decision');
+
+                localStorage.setItem('user', JSON.stringify(data.user));
+
+                if (data.user.role === 'customer') {
+                    localStorage.setItem('customerId', data.user._id);
+                    navigate('/home');
+                } else {
+                    localStorage.setItem('ownerId', data.user._id);
+                    navigate('/owner');
+                }
+
             } else {
-                alert(data.message);
+                alert(data.message || "Signup failed.");
             }
+
         } catch (error) {
             console.error("Signup error:", error);
             alert("Something went wrong. Please try again.");
@@ -96,6 +113,16 @@ export function CustomerSignup() {
                         onChange={handleChange}
                         required
                     />
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="" disabled>Select Your Identity</option>
+                        <option value="customer">Customer</option>
+                        <option value="owner">Owner</option>
+                    </select>
                     <div className="button-group">
                         <button type="button" onClick={handleCancel}>Cancel</button>
                         <button type="submit">Sign Up</button>

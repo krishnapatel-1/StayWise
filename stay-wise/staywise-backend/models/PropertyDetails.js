@@ -11,7 +11,7 @@ const PhotoSchema = new mongoose.Schema({
 const PropertyDetailSchema = new mongoose.Schema({
   ownerId: {
     type: String,
-    required: true
+    //required: true
   },
   propertyType: String,
   furnishing: String,
