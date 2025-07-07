@@ -2,6 +2,8 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js"; 
+import propertyRoutes from './routes/propertyRoutes.js'
+import photoRoutes from './routes/photoRoutes.js'
 import dotenv from "dotenv"; 
 import Grid from 'gridfs-stream';
 const conn = mongoose.connection;
@@ -25,6 +27,8 @@ app.get("/", (req, res) => {
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/property", propertyRoutes);
+app.use("/api/photos", photoRoutes)
 
 // MongoDB + GridFS setup
 let gfs;

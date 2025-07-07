@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import './FinalSection.css';
 
 
@@ -8,9 +9,9 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
 
   const handleFinalSubmit = async () => {
     const ownerId = localStorage.getItem("ownerId");
-
+    
     try {
-      const response = await fetch("http://localhost:5000/api/property/submit", {
+      const response = await fetch("http://localhost:4000/api/property/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -24,6 +25,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
         alert("✅ Property submitted successfully!");
         onSubmit(); // ⬅️ trigger your original onSubmit flow (reset + redirect)
       } else {
+        console.log(data.user._id)
         console.error("❌ Submission error:", data.message);
         alert("Submission failed!");
       }
