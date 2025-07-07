@@ -26,12 +26,16 @@ export function Login() {
         alert("Login successful");
         console.log(data.role);
         localStorage.setItem("user", JSON.stringify(data.user));
-        if(data.user.role === 'owner'){
-          navigate('/owner');
+
+        // Store either ownerId or customerId depending on the role
+        if (data.user.role === "owner") {
+          localStorage.setItem("ownerId", data.user._id); // ✅ required for property submission
+          navigate("/owner");
+        } else if (data.user.role === "customer") {
+          localStorage.setItem("customerId", data.user._id); // if needed for customer actions
+          navigate("/home");
         }
-        if(data.user.role === 'customer') {
-          navigate('/home');
-        }
+
       } else {
         alert(data.message);
       }

@@ -1,28 +1,88 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 import './FinalSection.css';
-
-
 
 const FinalSection = ({ formData, onBack, onSubmit }) => {
   const navigate = useNavigate();
 
   const handleFinalSubmit = async () => {
     const ownerId = localStorage.getItem("ownerId");
+    if (!ownerId) {
+      alert("❌ Owner ID not found. Please log in again.");
+      return;
+    }
+
+    // Set default "Unavailable" for services
+    const completeServices = (type === "pg room" || type === "hostel room")
+    ? {
+        mealsIncluded: formData.services?.mealsIncluded || "Unavailable",
+        gateOpen: formData.services?.gateOpen || "Unavailable",
+        gateClose: formData.services?.gateClose || "Unavailable",
+        housekeeping: formData.services?.housekeeping || "Unavailable",
+        laundry: formData.services?.laundry ?? false,
+      }
+    : {};
+
+    // Set default "Unavailable" for facilities
+    const completeFacilities = {
+      parking: formData.facilities?.parking || "Unavailable",
+      cctv: formData.facilities?.cctv ?? false,
+      guard: formData.facilities?.guard ?? false,
+      lift: formData.facilities?.lift ?? false,
+    };
+
+    const completeUtilities = {
+    electricity: formData.electricity || "Unavailable",
+    waterSupply: formData.waterSupply || "Unavailable",
+    wifi: formData.wifi ?? false,
+    ac: formData.ac ?? false,
+    fans: formData.fans ?? false,
+    geyser: formData.geyser ?? false,
+    refrigerator: formData.refrigerator ?? false,
+    washingMachine: formData.washingMachine ?? false,
+    powerBackup: formData.powerBackup ?? false,
+  };
+
+    // Convert photo object {label: {name, type, base64}} => array
+    const photoArray = Object.entries(formData.photos || {}).map(([label, file]) => ({
+      label,
+      ownerId,
+      name: file.name,
+      type: file.type,
+      base64: file.base64,
+    }));
+
+    const payload = {
+      ...formData,
+      ownerId,
+      photos: photoArray,
+      services: completeServices,
+      utilities: completeUtilities,
+      facilities: completeFacilities,
+      location: {
+        ...formData.location,
+        latitude: formData.location?.latitude || "Unavailable",
+        longitude: formData.location?.longitude || "Unavailable",
+      },
+    };
+
+
+    // console.log("📤 Final Payload:", payload);
 
     try {
-      const response = await fetch("http://localhost:5000/api/property/submit", {
+      const response = await fetch("http://localhost:4000/api/properties/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, ownerId }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         alert("✅ Property submitted successfully!");
-        onSubmit(); // ⬅️ trigger your original onSubmit flow (reset + redirect)
+        onSubmit(); // Reset + redirect
       } else {
         console.error("❌ Submission error:", data.message);
         alert("Submission failed!");
@@ -32,6 +92,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       alert("An error occurred during submission!");
     }
   };
+
 
   const {
     propertyType = "",
@@ -85,22 +146,21 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       <p><strong>Facing:</strong> {facing}</p>
       {type === "house" && houseFloorDetails.length > 0 && (
         <div className="floor-room-details">
-            <h4>Room Details Per Floor:</h4>
-            {houseFloorDetails.map((floor, index) => (
+          <h4>Room Details Per Floor:</h4>
+          {houseFloorDetails.map((floor, index) => (
             <div key={index} className="floor-item">
-                <strong>Floor {index + 1}:</strong>
-                <ul>
+              <strong>Floor {index + 1}:</strong>
+              <ul>
                 <li>Bedrooms: {floor?.bedrooms || 0}</li>
                 <li>Bathrooms: {floor?.bathrooms || 0}</li>
                 <li>Kitchens: {floor?.kitchens || 0}</li>
                 <li>Halls: {floor?.halls || 0}</li>
                 <li>Balconies: {floor?.balconies || 0}</li>
-                </ul>
+              </ul>
             </div>
-            ))}
+          ))}
         </div>
-        )}
-
+      )}
 
       {/* Utilities */}
       <h3>Utilities</h3>
@@ -122,14 +182,14 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       <p><strong>Lift/Elevator:</strong> {facilities.lift ? "Yes" : "No"}</p>
 
       {/* Services (Only for PG/Hostel) */}
-      {(type === "pg" || type === "hostel room") && (
+      {(type === "pg room" || type === "hostel room") && (
         <>
           <h3>Services</h3>
-          <p><strong>Mess Included:</strong> {services.mealsIncluded || "Not specified"}</p>
-          <p><strong>Gate Opening Time:</strong> {services.gateOpen || "Not specified"}</p>
-          <p><strong>Gate Closing Time:</strong> {services.gateClose || "Not specified"}</p>
-          <p><strong>Housekeeping:</strong> {services.housekeeping || "Not specified"}</p>
-          <p><strong>Laundry Services:</strong> {services.laundry ? "Yes" : "No"}</p>
+          <p><strong>Mess Included:</strong> {services.mealsIncluded || "Service unavailable"}</p>
+          <p><strong>Gate Opening Time:</strong> {services.gateOpen || "Service unavailable"}</p>
+          <p><strong>Gate Closing Time:</strong> {services.gateClose || "Service unavailable"}</p>
+          <p><strong>Housekeeping:</strong> {services.housekeeping || "Service unavailable"}</p>
+          <p><strong>Laundry Services:</strong> {services.laundry === true ? "Yes" : "Service unavailable"}</p>
         </>
       )}
 
@@ -145,20 +205,20 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
 
       {/* Pricing */}
       <h3>Pricing:</h3>
-        {formData.dailyRent && (
-        <p><strong>Rent per 24 Hours:</strong> ₹{formData.dailyRent}</p>
-        )}
-        {formData.monthlyRent && (
+      {dailyRent && (
+        <p><strong>Rent per 24 Hours:</strong> ₹{dailyRent}</p>
+      )}
+      {monthlyRent && (
         <>
-            <p><strong>Monthly Rent:</strong> ₹{formData.monthlyRent}</p>
-            <p><strong>Security Deposit:</strong> ₹{formData.securityDeposit}</p>
-            <p><strong>Maintenance Charges:</strong> ₹{formData.maintenanceCharges}</p>
-            <p><strong>Negotiable:</strong> {formData.negotiable ? "Yes" : "No"}</p>
+          <p><strong>Monthly Rent:</strong> ₹{monthlyRent}</p>
+          <p><strong>Security Deposit:</strong> ₹{securityDeposit}</p>
+          <p><strong>Maintenance Charges:</strong> ₹{maintenanceCharges}</p>
+          <p><strong>Negotiable:</strong> {negotiable ? "Yes" : "No"}</p>
         </>
-        )}
-        {formData.pricingNote && (
-        <p><strong>Additional Notes:</strong> {formData.pricingNote}</p>
-        )}
+      )}
+      {pricingNote && (
+        <p><strong>Additional Notes:</strong> {pricingNote}</p>
+      )}
 
       {/* Navigation */}
       <div className="navigation-buttons" style={{ marginTop: "20px" }}>

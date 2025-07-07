@@ -31,7 +31,7 @@ export const savePropertyDetails = async (req, res) => {
       maintenanceCharges,
       negotiable,
       pricingNote,
-      photos,
+      photos, // ← base64 array
     } = req.body;
 
     const newProperty = new PropertyDetail({
@@ -66,14 +66,30 @@ export const savePropertyDetails = async (req, res) => {
       photos,
     });
 
+    // console.log("📎 Photos received:", photos);
+
     const saved = await newProperty.save();
 
     res.status(201).json({
-      message: "Property details saved successfully",
+      message: "✅ Property saved with inline photos",
       propertyId: saved._id,
     });
   } catch (err) {
-    console.error("❌ Error saving property details:", err);
-    res.status(500).json({ message: "Failed to save property details" });
+    console.error("❌ Error saving property:", err);
+    res.status(500).json({ message: "Failed to save property" });
+  }
+};
+
+export const getPropertiesByOwner = async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+
+    // 🔧 Use the correct model!
+    const properties = await PropertyDetail.find({ ownerId });
+
+    res.status(200).json(properties);
+  } catch (error) {
+    console.error("Error fetching properties:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

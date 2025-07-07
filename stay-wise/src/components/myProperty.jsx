@@ -1,119 +1,109 @@
 import { useNavigate } from "react-router-dom";
-import { useState,useEffect} from "react";
+import { useState, useEffect } from "react";
+import "./myProperty.css";
 
-function Property(){
-    const rooms =[
-      {
-        location: "Gole ka mandir",
-        duration:500,
-        range:8000,
-        category:'single',
-        active: true
-      },
-      {
-        location: "Gole ka mandir",
-        duration:100,
-        range:4000,
-        category:'single',
-        active: false
-      },
-      {
-        location: "Gole ka mandir",
-        duration:1000,
-        range:8000000,
-        category:'house',
-        active: true
-      },
-      {
-        location: "Pragati Vihar",
-        duration:500,
-        range:10000,
-        category: 'double',
-        active: false
-      },
-      {
-        location: "City Center",
-        duration:100,
-        range:15000,
-        category: '3bhk',
-        active: true
+function MyProperty() {
+  const [properties, setProperties] = useState([]);
+  const navigate = useNavigate();
+
+  const dummyRooms = [
+    { location: "Gole ka mandir", duration: 500, range: 8000, category: "single", active: true },
+    { location: "Gole ka mandir", duration: 100, range: 4000, category: "single", active: false },
+    { location: "Gole ka mandir", duration: 1000, range: 8000000, category: "house", active: true },
+    { location: "Pragati Vihar", duration: 500, range: 10000, category: "double", active: false },
+    { location: "City Center", duration: 100, range: 15000, category: "3bhk", active: true },
+  ];
+
+  const [one, setOne] = useState(false);
+  const ownerId = localStorage.getItem("ownerId");
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const res = await fetch(`http://localhost:4000/api/properties/owner/${ownerId}`);
+        if (!res.ok) throw new Error("Failed to fetch properties");
+        const data = await res.json();
+        setProperties(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("❌ Error fetching properties:", err.message);
+        setProperties([]);
       }
-    ]
+    };
 
-    const [one,setOne]=useState(false);
-    const [curr,setCurr]=useState(0);
-    const navigate=useNavigate();
-    const availableRooms = rooms.filter(room=>room.active)
+    if (ownerId) fetchProperties();
+  }, [ownerId]);
 
-    const handleEvent=(curr)=>{
-        setCurr(curr);
-        setOne(!one);
-    }
+  const gotoprof = () => navigate("/ownprof");
+  const gotohome = () => navigate("/owner");
 
-    const gotoprof=()=>{
-        navigate('/ownprof')
-    }
+  const getFrontImageUrl = (property) => {
+    const front = property.photos?.find(p => p.label === "Property Front View");
+    return front?.base64 || null;
+  };
 
-    const handleClick = (e,index)=>{
-        alert("Request Sent")
-      navigate('/owner');
-    }
+  const availableRealRooms = properties.filter((p) => p.active !== false);
+  const availableDummyRooms = dummyRooms.filter((room) => room.active);
 
-    const gotohome=()=>{
-        navigate('/owner');
-    }
-
-    return (
+  return (
     <div className="home-page">
       <nav className="navbar">
         <h2 onClick={gotohome}>StayWise</h2>
         <input type="text" placeholder="Search..." className="search-input" />
         <div>
-        <button className="profile-btn" onClick={gotohome}>Home</button>
-        <button className="profile-btn" onClick={gotoprof}>Profile</button>
+          <button className="profile-btn" onClick={gotohome}>Home</button>
+          <button className="profile-btn" onClick={gotoprof}>Profile</button>
         </div>
       </nav>
 
       <div className="home-content">
         <h1>Welcome to StayWise</h1>
-        <p>All the available Rooms</p>
+        <p>Your Properties (Real & Dummy)</p>
       </div>
-     
-     <div className="prop-container">
-     <div className="prop-box1">
-        <h2 className="tx">Your Active Rooms:</h2>
-        {!one && <div className="prop-collection">
-            {availableRooms.map((room,index)=>
-                <div className="room-nbox">
-                    <h2>Room no. {index+1}</h2>
-                    <div className="photo"></div>
-                    <p><strong>Location : </strong>{room.location}</p>
-                    <p><strong>Duration : </strong>{room.duration}</p>
-                    <p><strong>Range : </strong>{room.range}</p>
-                    <p><strong>Category : </strong>{room.category}</p>
-                </div>
-            )}
-        </div>}
-    </div>
 
-    <div className="prop-box1">
-        <h2 className="tx">All Rooms:</h2>
-        {!one && <div className="prop-collection">
-            {rooms.map((room,index)=>
-                <div className="room-nbox">
-                    <h2>Room no. {index+1}</h2>
-                    <div className="photo"></div>
-                    <p><strong>Location : </strong>{room.location}</p>
-                    <p><strong>Duration : </strong>{room.duration}</p>
-                    <p><strong>Range : </strong>{room.range}</p>
-                    <p><strong>Category : </strong>{room.category}</p>
+      <div className="prop-container">
+        {/* Active Real Properties */}
+        <div className="prop-box1">
+          <h2 className="tx">Your Active Properties:</h2>
+          {!one && (
+            <div className="prop-collection">
+              {availableRealRooms.map((room, index) => (
+                <div className="room-nbox" key={room._id || index}>
+                  <h2>Property {index + 1}</h2>
+                  {getFrontImageUrl(room) ? (
+                    <img src={getFrontImageUrl(room)} alt="Front View" className="photo" />
+                  ) : (
+                    <div className="photo placeholder">No Image</div>
+                  )}
+                  <p><strong>Location:</strong> {room.location?.city}</p>
+                  <p><strong>Total Area:</strong> {room.totalArea}</p>
+                  <p><strong>Type:</strong> {room.propertyType}</p>
                 </div>
-            )}
-        </div>}
-    </div>
-    </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Dummy Properties */}
+        <div className="prop-box1">
+          <h2 className="tx">All Dummy Rooms:</h2>
+          {!one && (
+            <div className="prop-collection">
+              {dummyRooms.map((room, index) => (
+                <div className="room-nbox" key={index}>
+                  <h2>Room no. {index + 1}</h2>
+                  <div className="photo placeholder">No Image</div>
+                  <p><strong>Location:</strong> {room.location}</p>
+                  <p><strong>Duration:</strong> {room.duration}</p>
+                  <p><strong>Range:</strong> ₹{room.range}</p>
+                  <p><strong>Category:</strong> {room.category}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-export default Property;
+export default MyProperty;

@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 
 const PhotoSchema = new mongoose.Schema({
-  label: String,         // e.g., 'Bedroom 1'
-  fileId: String         // GridFS file _id
+  label: String,
+  name: String,
+  type: String,
+  base64: String, // ✅ added
 });
+
 
 const PropertyDetailSchema = new mongoose.Schema({
   ownerId: {
@@ -62,13 +65,15 @@ const PropertyDetailSchema = new mongoose.Schema({
 
   // Location
   location: {
-    houseNo: String,
-    street: String,
-    city: String,
-    district: String,
-    state: String,
-    country: String,
-    pincode: String
+    houseNo: { type: String, default: "Unavailable" },
+    street: { type: String, default: "Unavailable" },
+    city: { type: String, default: "Unavailable" },
+    district: { type: String, default: "Unavailable" },
+    state: { type: String, default: "Unavailable" },
+    country: { type: String, default: "Unavailable" },
+    pincode: { type: String, default: "Unavailable" },
+    latitude: { type: mongoose.Schema.Types.Mixed, default: "Unavailable" },
+    longitude: { type: mongoose.Schema.Types.Mixed, default: "Unavailable" },
   },
 
   // Pricing
