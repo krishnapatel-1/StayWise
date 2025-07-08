@@ -5,24 +5,20 @@ import './Profile.css';
 function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [req, setReq] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    const storedReq = localStorage.getItem("req");
-
+    
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
       navigate("/login");
     }
-
-    if (storedReq) {
-      setReq(JSON.parse(storedReq));
-    } else {
-      console.log("No requirements made");
-    }
   }, [navigate]);
+
+  if (!user) {
+      return <p>Loading user data...</p>;
+  }
 
   const handleHome = () => {
     navigate("/home");
@@ -33,30 +29,16 @@ function Profile() {
     navigate("/");
   };
 
-  if (!user) {
-    return <p>Loading user data...</p>;
-  }
-
   return (
     <div className="profile-wrapper">
       <div className="profile-container">
         <h1>Profile</h1>
 
         <div className="profile-info">
-          <p><strong>Full Name:</strong> {user.fullName}</p>
+          <p><strong>Full Name:</strong> {user.name}</p>
           <p><strong>Mobile Number:</strong> {user.mobile}</p>
           <p><strong>Email:</strong> {user.email}</p>
         </div>
-
-        {req && (
-          <div className="requirements-section">
-            <h2>Requirements</h2>
-            <p><strong>Location:</strong> {req.location}</p>
-            <p><strong>Duration:</strong> {req.duration}</p>
-            <p><strong>Range:</strong> {req.range}</p>
-            <p><strong>Category:</strong> {req.category}</p>
-          </div>
-        )}
 
         <div className="button-group">
           <button onClick={handleHome}>Home</button>

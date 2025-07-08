@@ -42,18 +42,24 @@ export function CustomerSignup() {
             });
 
             const data = await res.json();
-            console.log("📦 Backend response:", data);
+
+            if (data && data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+            }
+
+            if (!res.ok) {
+            alert(data.message || "Signup failed.");
+            return;
+            }
 
             if (res.ok && data.user) {
                 alert(data.message);
 
-                localStorage.setItem('user', JSON.stringify(data.user));
-
                 if (data.user.role === 'customer') {
-                    localStorage.setItem('customerId', data.user._id);
+                    localStorage.setItem('customerId', JSON.stringify(data.user._id));
                     navigate('/home');
                 } else {
-                    localStorage.setItem('ownerId', data.user._id);
+                    localStorage.setItem('ownerId', JSON.stringify(data.user._id));
                     navigate('/owner');
                 }
 
