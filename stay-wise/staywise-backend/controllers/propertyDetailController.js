@@ -1,14 +1,14 @@
-import PropertyDetail from "../models/propertyDetails.js";
+import PropertyDetail from "../models/PropertyDetails.js";
 
 export const savePropertyDetails = async (req, res) => {
   try {
-
+    
     if (!req.user || !req.user._id) {
       return res.status(401).json({ error: 'Unauthorized: No user found' });
     }
 
     const prop={
-      ownerId: req.user.id,
+      ownerId,
       propertyType,
       furnishing,
       totalArea,

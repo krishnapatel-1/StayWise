@@ -7,6 +7,9 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
 
   const handleFinalSubmit = async () => {
     const ownerId = localStorage.getItem("ownerId");
+    const user=JSON.parse(localStorage.getItem('user'));
+    console.log(user);
+    console.log(ownerId);
 
     if (!ownerId) {
       alert("❌ Owner ID not found. Please log in again.");
@@ -55,6 +58,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
 
     const payload = {
       ...formData,
+      user,
       ownerId,
       photos: photoArray,
       services: completeServices,
@@ -85,7 +89,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
         alert("✅ Property submitted successfully!");
         onSubmit(); // Reset + redirect
       } else {
-        console.log(data.user._id)
+        console.log(data.user)
         console.error("❌ Submission error:", data.message);
         alert("Submission failed!");
       }
