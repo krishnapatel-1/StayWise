@@ -36,6 +36,7 @@ export const savePropertyDetails = async (req, res) => {
       negotiable,
       pricingNote,
       photos,
+      toLet,
     } = req.body;
 
     if (typeof ownerId === "string") {
@@ -72,6 +73,7 @@ export const savePropertyDetails = async (req, res) => {
       negotiable,
       pricingNote,
       photos,
+      toLet,
     });
 
     const saved = await newProperty.save();
@@ -97,6 +99,42 @@ export const getPropertiesByOwner = async (req, res) => {
     res.status(200).json(properties);
   } catch (error) {
     console.error("Error fetching properties:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ✅ Get a single property by ID
+export const getPropertyById = async (req, res) => {
+  try {
+    const { propertyId } = req.params;
+    const property = await PropertyDetail.findById(propertyId);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+    res.status(200).json(property);
+  } catch (err) {
+    console.error("Error fetching property:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ✅ Toggle the toLet field
+export const toggleToLetStatus = async (req, res) => {
+  try {
+    const { propertyId } = req.params;
+
+    const property = await PropertyDetail.findById(propertyId);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    // Flip the value
+    property.toLet = property.toLet === "Yes" ? "No" : "Yes";
+    await property.save();
+
+    res.status(200).json({ message: `To-Let status changed to ${property.toLet}`, toLet: property.toLet });
+  } catch (err) {
+    console.error("Error toggling To-Let:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

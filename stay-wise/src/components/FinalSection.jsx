@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import './FinalSection.css';
 
 const FinalSection = ({ formData, onBack, onSubmit }) => {
   const navigate = useNavigate();
+
+  const [toLet, setToLet] = useState(true);
+
 
   const handleFinalSubmit = async () => {
     const ownerId = localStorage.getItem("ownerId");
@@ -60,6 +63,7 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       ...formData,
       user,
       ownerId,
+      toLet,
       photos: photoArray,
       services: completeServices,
       utilities: completeUtilities,
@@ -225,6 +229,31 @@ const FinalSection = ({ formData, onBack, onSubmit }) => {
       {pricingNote && (
         <p><strong>Additional Notes:</strong> {pricingNote}</p>
       )}
+
+      {/* To-Let Option */}
+      <h3>Rental Status</h3>
+      <div>
+        <label>
+          <input
+            type="radio"
+            value="Yes"
+            checked={toLet === "Yes"}
+            onChange={() => setToLet("Yes")}
+          />
+          To-Let
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="No"
+            checked={toLet === "No"}
+            onChange={() => setToLet("No")}
+          />
+          Not To-Let
+        </label>
+      </div>
+
+
 
       {/* Navigation */}
       <div className="navigation-buttons" style={{ marginTop: "20px" }}>

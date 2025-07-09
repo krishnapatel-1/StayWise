@@ -14,6 +14,7 @@ import Selected from './components/SelectedRoom';
 import AddYourProperty from './components/AddYourProperty';
 import OwnProfile from './components/OwnerProfile';
 import Property from './components/myProperty';
+import ViewProperty from "./components/ViewProperty";
 import './App.css';
 
 function App() {
@@ -35,7 +36,8 @@ function App() {
         <Route path="/ownprof" element={<OwnProfile/>}/>
         <Route path="*" element={<LandingPage />} />
         <Route path="/add-property" element={<AddYourProperty />} />
-        <Route path="/my-property" element={<Property/>}/> 
+        <Route path="/my-property" element={<Property/>}/>
+        <Route path="/property/:propertyId" element={<ViewProperty />} />
       </Routes>
     </Router>
   );

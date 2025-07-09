@@ -17,8 +17,7 @@ function MyProperty() {
   const [one, setOne] = useState(false);
   const ownerId = localStorage.getItem("ownerId");
 
-  console.log(`📤 Fetching from: http://localhost:4000/api/properties/owner/${ownerId}`);
-
+  // console.log(`📤 Fetching from: http://localhost:4000/api/properties/owner/${ownerId}`);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -47,8 +46,8 @@ function MyProperty() {
   const availableRealRooms = properties.filter((p) => p);
   const availableDummyRooms = dummyRooms.filter((room) => room.active);
 
-  console.log("✅ Fetched Properties:", properties);
-  console.log("🟢 Showing:", availableRealRooms);
+  // console.log("✅ Fetched Properties:", properties);
+  // console.log("🟢 Showing:", availableRealRooms);
 
   return (
     <div className="home-page">
@@ -83,6 +82,9 @@ function MyProperty() {
                   <p><strong>Location:</strong> {room.location?.city}</p>
                   <p><strong>Total Area:</strong> {room.totalArea}</p>
                   <p><strong>Type:</strong> {room.propertyType}</p>
+                  <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
+
+                  <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
               ))}
             </div>

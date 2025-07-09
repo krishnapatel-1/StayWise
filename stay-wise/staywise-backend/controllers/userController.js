@@ -41,7 +41,7 @@ export const loginUser = async (req, res) => {
       message: "Login successful",
       user: {
         _id: user._id,
-        fullName: user.name,  // ✅ Correct: pulling from the `name` field
+        name: user.name,  // ✅ Correct: pulling from the `name` field
         email: user.email,
         mobile: user.mobile,
         role: user.role

@@ -109,3 +109,35 @@
   left: 0;
   color: #3498db;
 }
+
+/* FinalSection.css */
+
+.rental-status-group {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.rental-status-group h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.rental-status-options {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.rental-status-options label {
+  font-size: 1rem;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rental-status-options input[type="radio"] {
+  transform: scale(1.2);
+  cursor: pointer;
+}
