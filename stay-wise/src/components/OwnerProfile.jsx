@@ -7,6 +7,8 @@ function OwnProfile() {
   const [user, setUser] = useState(null);
   const [req, setReq] = useState(null);
 
+  localStorage.getItem("user")
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedReq = localStorage.getItem("req");
@@ -43,10 +45,12 @@ function OwnProfile() {
         <h1>Owner Profile</h1>
 
         <div className="profile-info">
-          <p><strong>Full Name:</strong> {user.fullName}</p>
-          <p><strong>Mobile Number:</strong> {user.mobile}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Full Name:</strong> {user.fullName || "Not provided"}</p>
+          <p><strong>Mobile Number:</strong> {user.mobile || "Not provided"}</p>
+          <p><strong>Email:</strong> {user.email || "Not provided"}</p>
+          <p><strong>Owner ID:</strong> {user._id || "Unavailable"}</p>
         </div>
+
 
         <div className="button-group">
           <button onClick={handleHome}>Home</button>
