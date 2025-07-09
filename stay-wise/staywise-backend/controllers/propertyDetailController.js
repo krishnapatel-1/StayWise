@@ -2,12 +2,11 @@ import PropertyDetail from "../models/PropertyDetails.js";
 
 export const savePropertyDetails = async (req, res) => {
   try {
-    
-    if (!req.user || !req.user._id) {
-      return res.status(401).json({ error: 'Unauthorized: No user found' });
+    if (!req.body.ownerId) {
+      return res.status(400).json({ error: 'Bad Request: ownerId missing' });
     }
 
-    const prop={
+    let {
       ownerId,
       propertyType,
       furnishing,
@@ -36,11 +35,15 @@ export const savePropertyDetails = async (req, res) => {
       maintenanceCharges,
       negotiable,
       pricingNote,
-      photos, // ← base64 array
+      photos,
     } = req.body;
 
+    if (typeof ownerId === "string") {
+      ownerId = ownerId.replace(/"/g, "");
+    }
+
     const newProperty = new PropertyDetail({
-      ownerId: req.user._id,
+      ownerId,
       propertyType,
       furnishing,
       totalArea,
@@ -71,8 +74,6 @@ export const savePropertyDetails = async (req, res) => {
       photos,
     });
 
-    // console.log("📎 Photos received:", photos);
-
     const saved = await newProperty.save();
 
     res.status(201).json({
@@ -81,9 +82,10 @@ export const savePropertyDetails = async (req, res) => {
     });
   } catch (err) {
     console.error("❌ Error saving property:", err);
-    res.status(500).json({ message: "Failed to save property" });
+    res.status(500).json({ message: "Failed to save property", error: err.message });
   }
 };
+
 
 export const getPropertiesByOwner = async (req, res) => {
   try {
