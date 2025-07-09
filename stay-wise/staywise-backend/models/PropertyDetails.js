@@ -21,6 +21,8 @@ const PropertyDetailSchema = new mongoose.Schema({
   balconyCount: Number,
   facing: String,
 
+  toLet: { type: String, enum: ["Yes", "No"], default: "Yes" },
+
   // For house type
   houseFloorDetails: [
     {

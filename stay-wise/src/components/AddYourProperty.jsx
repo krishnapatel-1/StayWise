@@ -138,6 +138,7 @@ const AddYourProperty = () => {
                 alert('✅ Property submitted!');
                 setFormData({});
                 setCurrentSection(0);
+                navigate("/owner");
             }}
             />
         );

@@ -1,15 +1,16 @@
 import express from "express";
 import {
   savePropertyDetails,
-  getPropertiesByOwner
+  getPropertiesByOwner,
+  getPropertyById,        // ✅ Make sure this is imported
+  toggleToLetStatus,      // ✅ Also import this
 } from "../controllers/propertyDetailController.js";
 
 const router = express.Router();
 
-// Existing routes
 router.post("/submit", savePropertyDetails);
-
-// ✅ Missing route that causes your 404
 router.get("/owner/:ownerId", getPropertiesByOwner);
+router.get("/:propertyId", getPropertyById);           // ✅ Single property route
+router.patch("/:propertyId/tolet", toggleToLetStatus); // ✅ Toggle To-Let
 
 export default router;

@@ -45,7 +45,7 @@ function OwnProfile() {
         <h1>Owner Profile</h1>
 
         <div className="profile-info">
-          <p><strong>Full Name:</strong> {user.fullName || "Not provided"}</p>
+          <p><strong>Full Name:</strong> {user.name || "Not provided"}</p>
           <p><strong>Mobile Number:</strong> {user.mobile || "Not provided"}</p>
           <p><strong>Email:</strong> {user.email || "Not provided"}</p>
           <p><strong>Owner ID:</strong> {user._id || "Unavailable"}</p>
