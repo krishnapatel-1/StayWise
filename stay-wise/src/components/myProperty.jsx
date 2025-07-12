@@ -4,6 +4,7 @@ import "./myProperty.css";
 
 function MyProperty() {
   const [properties, setProperties] = useState([]);
+  const [loading,setLoading]=useState(true);
   const navigate = useNavigate();
 
   const dummyRooms = [
@@ -26,6 +27,7 @@ function MyProperty() {
         if (!res.ok) throw new Error("Failed to fetch properties");
         const data = await res.json();
         setProperties(Array.isArray(data) ? data : []);
+        setLoading(false);
       } catch (err) {
         console.error("❌ Error fetching properties:", err.message);
         setProperties([]);
@@ -43,8 +45,8 @@ function MyProperty() {
     return front?.base64 || null;
   };
 
-  const availableRealRooms = properties.filter((p) => p);
-  const availableDummyRooms = dummyRooms.filter((room) => room.active);
+  const availableRealRooms = properties.filter(p => p.toLet==true);
+  const availableDummyRooms = properties.filter((room) => room);
 
   // console.log("✅ Fetched Properties:", properties);
   // console.log("🟢 Showing:", availableRealRooms);
@@ -69,9 +71,17 @@ function MyProperty() {
         {/* Active Real Properties */}
         <div className="prop-box1">
           <h2 className="tx">Your Active Properties:</h2>
-          {!one && (
+          {loading?(
+            <div className="load">
+              Loading Please Wait...
+            </div>
+          ) : (
             <div className="prop-collection">
-              {availableRealRooms.map((room, index) => (
+              {availableRealRooms.length==0?(
+                <div className="load">
+                  No Active Property Currently!
+                </div>
+              ):(availableRealRooms.map((room, index) => (
                 <div className="room-nbox" key={room._id || index}>
                   <h2>Property {index + 1}</h2>
                   {getFrontImageUrl(room) ? (
@@ -86,7 +96,40 @@ function MyProperty() {
 
                   <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
-              ))}
+              )))}
+            </div>
+          )}
+        </div>
+
+        {/* All Real Properties */}
+        <div className="prop-box1">
+          <h2 className="tx">All Properties:</h2>
+          {loading?(
+            <div className="load">
+              Loading Please Wait...
+            </div>
+          ) : (
+            <div className="prop-collection">
+              {properties.length==0?(
+                <div className="load">
+                  No Property Created...
+                </div>
+              ):(properties.map((room, index) => (
+                <div className="room-nbox" key={room._id || index}>
+                  <h2>Property {index + 1}</h2>
+                  {getFrontImageUrl(room) ? (
+                    <img src={getFrontImageUrl(room)} alt="Front View" className="photo" />
+                  ) : (
+                    <div className="photo placeholder">No Image</div>
+                  )}
+                  <p><strong>Location:</strong> {room.location?.city}</p>
+                  <p><strong>Total Area:</strong> {room.totalArea}</p>
+                  <p><strong>Type:</strong> {room.propertyType}</p>
+                  <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
+
+                  <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
+                </div>
+              )))}
             </div>
           )}
         </div>
