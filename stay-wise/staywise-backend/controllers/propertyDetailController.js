@@ -118,6 +118,16 @@ export const getPropertyById = async (req, res) => {
   }
 };
 
+export const allproperties = async (req, res) => {
+  try {
+    const properties = await PropertyDetail.find({});
+    res.status(200).json(properties);
+  } catch (error) {
+    console.error("🔥 Server error:", error);
+    res.status(500).json({ error: "Error fetching properties" });
+  }
+};
+
 // ✅ Toggle the toLet field
 export const toggleToLetStatus = async (req, res) => {
   try {
