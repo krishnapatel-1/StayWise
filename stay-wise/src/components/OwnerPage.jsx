@@ -42,7 +42,7 @@ function Owner(){
                     <button onClick={handleView}>View Your Property</button>
                 </div>
                 <div className="owner-dash">
-                    <h2>DashBoard</h2>
+                    <h2 className="text-gray-900 dark:text-white font-bold text-3xl mt-4 text-center">DashBoard</h2>
                 </div>
               </div>
         </div>
