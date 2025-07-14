@@ -63,13 +63,11 @@ function MyProperty() {
         <div className="prop-box1">
           <h2 className="tx">Your Active Properties:</h2>
           {loading?(
-            <div className="load">
-              Loading Please Wait...
-            </div>
+            <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
               {availableRealRooms.length==0?(
-                <div className="load">
+                <div className="loader">
                   No Active Property Currently!
                 </div>
               ):(availableRealRooms.map((room, index) => (
@@ -96,9 +94,7 @@ function MyProperty() {
         <div className="prop-box1">
           <h2 className="tx">Inactive Properties:</h2>
           {loading?(
-            <div className="load">
-              Loading Please Wait...
-            </div>
+            <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
               {inactiveRooms.length==0?(

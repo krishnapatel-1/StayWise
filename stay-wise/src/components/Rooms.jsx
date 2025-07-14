@@ -77,9 +77,7 @@ function Rooms(){
         <div className="prop-box1">
           <h2 className="tx">All Properties:</h2>
           {loading?(
-            <div className="load">
-              Loading Please Wait...
-            </div>
+            <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
               {activeRooms.length==0?(
