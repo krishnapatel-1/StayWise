@@ -1,73 +1,95 @@
 body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
-  background-color: #00a6a6;
+  font-family: 'Inter', sans-serif;
+  background: #0f1116;
+  color: #f1f1f1;
 }
 
+/* Main Wrapper */
 .profile-wrapper {
-  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: #00a6a6;
+  align-items: center;
+  padding: 4rem 2rem;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #15171c 0%, #0f1116 100%);
 }
 
-/* Card container */
+/* Glass Container */
 .profile-container {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 20px rgba(0, 255, 224, 0.05);
+  border-radius: 20px;
+  padding: 3rem;
   max-width: 600px;
-  width: 90%;
-  background-color: white;
-  color: #00a6a6;       
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  text-align: left;
 }
 
+/* Headings */
 .profile-container h1 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: #00a6a6;
+  color: #00ffe0;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-.requirements-section h2 {
-  margin-bottom: 1rem;
-  color: #00a6a6;
-  border-bottom: 1px solid #cce7f8;
-  padding-bottom: 0.5rem;
+.profile-container h2 {
+  color: #00ffe0;
+  font-size: 1.5rem;
+  margin-top: 2rem;
 }
 
+/* Info Sections */
 .profile-info p,
 .requirements-section p {
+  margin: 0.7rem 0;
   font-size: 1rem;
-  margin: 0.5rem 0;
+  color: #ccc;
 }
 
 .profile-info strong,
 .requirements-section strong {
-  font-weight: 600;
-  color: #00a6a6;
+  color: #00ffe0;
 }
 
+/* Buttons */
 .button-group {
+  margin-top: 2.5rem;
   display: flex;
-  justify-content: space-between;
   gap: 1rem;
-  margin-top: 2rem;
+  flex-wrap: wrap;
 }
 
 .button-group button {
-  flex: 1;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background-color: #00a6a6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
+  padding: 0.7rem 1.5rem;
+  background: transparent;
+  color: #00ffe0;
+  border: 1px solid #00ffe0;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  font-weight: bold;
+  transition: all 0.3s ease;
 }
 
 .button-group button:hover {
-  background-color: #008f8f;
+  background: #00ffe025;
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 2rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
 }
