@@ -91,6 +91,10 @@ function ViewProperty() {
         Close
       </button>
 
+      <button onClick={() => navigate(`/edit-property/${property._id}`)} style={{marginLeft: "10px"}}>
+        Edit Details
+      </button>
+
       <h3>Location</h3>
       <p><strong>City:</strong> {location.city}</p>
       <p><strong>Street:</strong> {location.street}</p>

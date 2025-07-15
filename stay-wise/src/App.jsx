@@ -17,6 +17,7 @@ import Property from './components/myProperty';
 import ViewProperty from "./components/ViewProperty";
 import ThemeToggle from './components/ThemeToggle';
 import SearchRooms from './components/SearchRoom';
+import EditProperty from './components/EditProperty';
 // import Landing from './components/Landing';
 import './App.css';
 
@@ -24,17 +25,15 @@ import './App.css';
 function AppContent() {
   const location = useLocation();
 
-  // You can improve this logic using AuthContext or session-based check
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const user = localStorage.getItem("user"); // Can be token or custom logic
+    const user = localStorage.getItem("user");
     setIsLoggedIn(!!user);
   }, [location.pathname]);
 
   return (
     <>
-      {/* Conditionally show theme toggle button */}
       {isLoggedIn && (
         <div style={{
           position: 'fixed',
@@ -63,7 +62,7 @@ function AppContent() {
         <Route path="/property/:propertyId" element={<ViewProperty />} />
         <Route path="*" element={<LandingPage />} />
         <Route path='/search' element={<SearchRooms/>} />
-        {/* <Route path="/" element={<Landing />} /> */}
+        <Route path="/edit-property/:propertyId" element={<EditProperty />} />
       </Routes>
     </>
   );
