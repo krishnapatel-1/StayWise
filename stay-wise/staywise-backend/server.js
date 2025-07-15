@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import propertyRoutes from "./routes/propertyRoutes.js";
 import locationRoutes from './routes/locationRoutes.js';
+import selectedRoutes from './routes/selectedRoom.js'
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ mongoose.connect(process.env.MONGO_URI, {
   app.use("/api/users", userRoutes);
   app.use("/api/properties", propertyRoutes);
   app.use('/api', locationRoutes);
+  app.use('/api',selectedRoutes);
 
   // Start server
   app.listen(PORT, "0.0.0.0", () => {

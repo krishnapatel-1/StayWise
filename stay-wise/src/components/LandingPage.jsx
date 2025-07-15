@@ -9,6 +9,8 @@ import Middle_bar from './middlebar';
 
 function LandingPage() {
   const navigate = useNavigate();
+  
+
   return (
     <div className="landing-wrapper">
       <div className="landing-card">

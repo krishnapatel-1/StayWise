@@ -33,15 +33,10 @@ function Home(){
       navigate('/matched');  
     }
 
-    const handleSuggestionClick = (location) => {
-      setReq(prev => ({ ...prev, location }));
-      setSuggestions([]);
-    };
-
     const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
-      navigate(`/rooms?location=${encodeURIComponent(location)}`);
+      navigate(`/search?location=${encodeURIComponent(location)}`);
     };
 
     const showrooms=()=>{
@@ -58,7 +53,6 @@ function Home(){
         try {
           const res = await fetch(`http://localhost:4000/api/locations?q=${navbarSearch}`);
           const data = await res.json();
-          console.log("🔍 Location suggestions from backend:", data);
           setNavbarSuggestions(data);
         } catch (err) {
           console.error('Error fetching navbar locations:', err);
