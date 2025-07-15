@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Home from './components/HomePage';
 import Profile from './components/Profile';
 import LandingPage from './components/LandingPage';
@@ -15,30 +15,64 @@ import AddYourProperty from './components/AddYourProperty';
 import OwnProfile from './components/OwnerProfile';
 import Property from './components/myProperty';
 import ViewProperty from "./components/ViewProperty";
+import ThemeToggle from './components/ThemeToggle';
+import SearchRooms from './components/SearchRoom';
+// import Landing from './components/Landing';
 import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0);
+
+function AppContent() {
+  const location = useLocation();
+
+  // You can improve this logic using AuthContext or session-based check
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user"); // Can be token or custom logic
+    setIsLoggedIn(!!user);
+  }, [location.pathname]);
 
   return (
-    <Router>
+    <>
+      {/* Conditionally show theme toggle button */}
+      {isLoggedIn && (
+        <div style={{
+          position: 'fixed',
+          top: '1rem',
+          right: '1rem',
+          zIndex: 999
+        }}>
+          <ThemeToggle />
+        </div>
+      )}
+
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/customerSignup" element={<CustomerSignup />} />
-        <Route path="/ownerSignup" element={<OwnerSignup />}/>
+        <Route path="/ownerSignup" element={<OwnerSignup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/decision" element={<Decision />} />
         <Route path="/owner" element={<Owner />} />
-        <Route path="/rooms" element={<Rooms/>}/>
-        <Route path="/matched" element={<Matched/>}/>
-        <Route path="/selected" element={<Selected/>}/>
-        <Route path="/ownprof" element={<OwnProfile/>}/>
-        <Route path="*" element={<LandingPage />} />
+        <Route path="/rooms" element={<Rooms />} />
+        <Route path="/matched" element={<Matched />} />
+        <Route path="/selected" element={<Selected />} />
+        <Route path="/ownprof" element={<OwnProfile />} />
         <Route path="/add-property" element={<AddYourProperty />} />
-        <Route path="/my-property" element={<Property/>}/>
+        <Route path="/my-property" element={<Property />} />
         <Route path="/property/:propertyId" element={<ViewProperty />} />
+        <Route path="*" element={<LandingPage />} />
+        <Route path='/search' element={<SearchRooms/>} />
+        {/* <Route path="/" element={<Landing />} /> */}
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

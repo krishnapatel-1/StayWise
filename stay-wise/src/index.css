@@ -1,88 +1,29 @@
-/*:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* === Theme Variables === */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #111827;
+  --card-bg: #f9fafb;
+  --accent: #03A6A1;
+  --btn-hover: #037b77;
+  --logout-hover: #ef4444;
+  --navbar-bg: #012525;
+  --navbar-text: white;
+  --transition: all 0.3s ease;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* === Dark Theme Overrides === */
+[data-theme='dark'] {
+  --bg-color: #0f172a;
+  --text-color: #e2e8f0;
+  --card-bg: #1e293b;
+  --accent: #38bdf8;
+  --btn-hover: #0284c7;
+  --logout-hover: #ef4444;
+  --navbar-bg: #0f172a;
+  --navbar-text: white;
 }
 
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-
-.home-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-
-.navbar {
-  background-color: #0f172a;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #38bdf8;
-}
-
-
-.search-input {
-  flex: 1;
-  margin: 0 1.5rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 1rem;
-  max-width: 400px;
-}
-
-.profile-btn {
-  background-color: #38bdf8;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 0.375rem;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.profile-btn:hover {
-  background-color: #0ea5e9;
-}*/
-
+/* === Reset & Global Styles === */
 * {
   margin: 0;
   padding: 0;
@@ -91,45 +32,62 @@ body {
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f9fafb;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: var(--transition);
 }
 
-/* Full-page container */
-.home-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 
-.navbar {
-  /*position: fixed;*/
-  top: 0;
-  left: 0;
-  width: 100%; 
-  height: 100px;
-  background-color:  #012525; /* Dark navy */
+/* === Buttons === */
+button {
+  background-color: var(--accent);
   color: white;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+
+button:hover {
+  background-color: var(--btn-hover);
+  border-color: #7dcbc9;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* === Navbar === */
+.navbar {
+  width: 100%;
+  height: 100px;
+  background-color: var(--navbar-bg);
+  color: var(--navbar-text);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.navbar h2{
+.navbar h2 {
   padding: 40px;
   font-size: xx-large;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
 }
-/* Logo */
+
+/* === Reusable UI === */
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #38bdf8;
+  color: var(--accent);
 }
 
-/* Search Input */
 .search-input {
   flex: 1;
   max-width: 400px;
@@ -140,9 +98,9 @@ body {
   font-size: 1rem;
 }
 
-/* Profile Button */
+/* === Profile Button === */
 .profile-btn {
-  background-color:#03A6A1;
+  background-color: var(--accent);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -150,23 +108,29 @@ body {
   border-radius: 0.375rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: var(--transition);
 }
 
 .profile-btn:hover {
-  background-color: #037b77;
+  background-color: var(--btn-hover);
 }
 
-/* Home Content */
+/* === Custom Component Styles === */
+.home-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .home-content {
-  padding: 3rem 2rem; /* space to avoid overlap from fixed navbar */
+  padding: 3rem 2rem;
   text-align: center;
 }
 
 .home-content h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 .home-content p {
@@ -174,348 +138,183 @@ body {
   color: #475569;
 }
 
-h1 {
-  font-size: 5.2em;
-  line-height: 1.1;
-  color: black;
-}
-
-.cap1 h2{
+.cap1 h2 {
   font-size: xx-large;
 }
 
+/* === Form === */
 .cust-form {
-  background-color:  #03A6A1;
+  background-color: var(--accent);
   padding: 30px;
   border-radius: 10%;
-  width: auto;
-  height: 76vh;
   display: grid;
   place-items: center;
   gap: 50px;
-  margin: 0px 80px 0px 80px;
+  margin: 0 80px;
+  height: 76vh;
 }
 
-.cust-form input{
+.cust-form input,
+.cust-form select {
   width: 600px;
   height: 40px;
-  padding: 20px;
+  padding: 10px;
   font-size: large;
 }
 
-.cust-form button{
+.cust-form button {
   width: 300px;
 }
 
-.cust-form select{
-  width: 600px;
-  height: 40px;
-}
-
-
-.cap1{
-  height: auto;
-  width: auto;
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-  
-}
-
-.cap1 select{
-  font-size: large;
-  padding: 5px;
-}
-
-.decision-box {
-  background-color: #03A6A1;
-  padding: 20px;
-  margin: 5%;
-  width: 1050px;
-  height: 600px;
-  border-radius: 10%;
-  display: grid;
-  place-items: center;
-};
-
-.details{
-  display: grid;
-  justify-content: center;
-  gap: 10px;
-}
-
-.big-photo{
-  background-color: red;
-  width: 400px;
-  height: 500px;
-}
-
-.container{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  background-color: #03A6A1;
-}
-
-.content {
-  text-align: center;
-  margin-top: 190px;
-  gap: 16px;
-}
-
-.button-group {
-  display: flex;
-  margin-bottom: 210px;
-  gap: 16px;
-}
-
-
-.line1{
-  background-color: red;
-}
-
-.line2{
-  background-color: blue;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color:#7dcbc9;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
+/* === Buttons Section === */
 .button1 {
   display: grid;
   justify-items: center;
   align-items: center;
+  font-size: 2em;
+  color: var(--accent);
+  background-color: white;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 2em;
-  color: #03A6A1;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
-  width: auto;
-  height: auto;
+  transition: var(--transition);
 }
 
-.room-box{
-  width: auto;
-  height: auto;
-  padding: 20px;
-  display: grid;
-  gap: 5px;
+.button-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 210px;
 }
 
-.room-box-ele {
-  width: 600px;
-  height: 100px;
-  background-color: #03A6A1;
-  display: grid;
-  place-items: center;
+/* === Rooms & Layouts === */
+.room-box,
+.room,
+.room-box-ele,
+.room-nbox,
+.manage-room,
+.own-box,
+.owner-dash,
+.prop-collection {
+  transition: var(--transition);
 }
 
-.room-box-ele:hover{
+.room-box-ele:hover,
+.photo:hover,
+.room-nbox:hover {
   transform: scale(1.05);
-
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.manage-room{
-  width: 1200px;
-  height: auto;
-  padding: 50px;
-  border-radius: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
-  background-color: #012525;
-  gap: 20px;
-
-}
-
-.photo{
-  width: 300px;
-  height: 200px;
+.room,
+.room-box-ele,
+.room-nbox {
+  background-color: var(--accent);
   border-radius: 15%;
-  background-color: white;
-  border-radius: 10%;
-  padding: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-size: x-large;
-}
-
-.photo:hover{
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  
-}
-
-.room-nbox{
-  flex: '0 0 calc(33.33% - 16px)';
-  background-color:#03A6A1;
-  border: '1px solid gray';
-  box-sizing: 'border-box';
-  display: grid;
-  place-content: center;
-  height: 350px;
-  width: 350px;
-  padding: 40px;
-  border-radius: 5%;
-}
-
-.room-nbox:hover{
-  transform: scale(1.03);
-
-}
-.rooms-collection{
-  border-radius: 10%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 30px;
-  gap: 30px;
-}
-
-.room{
-  width: 500px;
-  height: 400px;
   padding: 20px;
-  display: grid;
-  justify-items: center;
-  background-color: #03A6A1;
-  border-radius: 15%;
-  gap:10px;
 }
 
-.room p{
+.room p {
   font-size: large;
 }
 
-.nav{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100vw;
-    background-color: #0f172a; 
-    padding: 0.75rem 2rem;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-button:hover {
-  border-color: #7dcbc9;
+/* === Owner Panel === */
+.own-box,
+.owner-dash {
+  background-color: var(--navbar-bg);
+  color: var(--text-color);
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-
-/* OWNER PAGE STYLING */
-
-.own-box{
-  width: 1200px;
-  height: auto;
-  padding: 20px;
-  border-radius: 10%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  justify-items: center;
-  background-color: #012525;
-  gap: 90px;
-}
-
-.btn-own{
-  display: grid;
-  place-content: center;
-  gap: 60px;
-  padding: 70px;
-}
-
-.btn-own button{
-  height: 70px;
-  weight: 500px;
-  font-size: large;
-  background-color: #03A6A1; 
-}
-
-.owner-dash{
-  height: 600px;
-  width: 500px;
-  background-color: #03A6A1;
-  border-radius: 5%;
-}
-
-.owner-dash h2{
+.owner-dash h2 {
   padding: 30px;
-  display: flex;
-  justify-content: center;
+  color: var(--text-color);   /* ✨ This is the key fix for visibility in both themes */
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
 }
 
-/* OWNER STYLING ENDS */
-
-
-/* PROPERTY STYLING*/
-
-.prop-box{
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* === Logout Hover === */
+.logout-btn:hover {
+  background-color: var(--logout-hover) !important;
 }
 
-.prop-container{
-  display: grid;
-  gap:80px;
-}
-
-.prox-box1{
-  display: grid;
-  justify-content: center;  
-}
-
-.tx{
-  font-size: xx-large;
-  margin: 0px 120px 30px 120px;
-
-}
-
-.prop-collection{
-  border-radius: 5%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 20px;
-  gap: 30px;
-  margin: 0px 90px 0px 90px;
-  background-color: #012525;
-}
-
-/* PROPERTY ENDS */
-
+/* === Responsive & Media === */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px; /* Adjust based on context or use 100vh for full-screen center */
+  width: 100%;
+}
+
+.loader {
+  width: 50px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: 
+    radial-gradient(farthest-side, #03A6A1 94%, #0000) top/8px 8px no-repeat,
+    conic-gradient(#0000 30%, #03A6A1);
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+  animation: l13 1s infinite linear;
+}
+
+@keyframes l13{ 
+  100%{transform: rotate(1turn)}
+}
+
+.owner-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh; /* Adjust based on navbar height */
+  text-align: center;
+  gap: 30px;
+}
+
+.dashboard-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.btn-own {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-own button {
+  font-size: 1rem;
+  padding: 12px 24px;
+  border-radius: 8px;
+  background-color: white;
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+
+.btn-own button:hover {
+  transform: scale(1.05);
+  background-color: var(--card-bg);
+}
+
+.showing{
+  margin-left: 64px;
+  font-size: larger;
 }

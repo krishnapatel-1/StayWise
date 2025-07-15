@@ -28,18 +28,19 @@ export default function Owner() {
         <h1>Welcome to StayWise</h1>
         <p>Get Tenants without any effort</p>
       </div>
+// <<<<<<< main
 
-      <div className="prop-box">
-        <div className="own-box">
-          <div className="btn-own">
-            <button onClick={handleCreate}>Create Property</button>
-            <button onClick={handleView}>View Your Property</button>
-          </div>
-          <div className="owner-dash">
-            <h2>DashBoard</h2>
-          </div>
-        </div>
-      </div>
+//       <div className="prop-box">
+//         <div className="own-box">
+//           <div className="btn-own">
+//             <button onClick={handleCreate}>Create Property</button>
+//             <button onClick={handleView}>View Your Property</button>
+//           </div>
+//           <div className="owner-dash">
+//             <h2>DashBoard</h2>
+//           </div>
+//         </div>
+//       </div>
 
       {/* Why Choose Us Section */}
       <section className="why-choose-us owner-section">
@@ -65,6 +66,19 @@ export default function Owner() {
             <h3>24/7 Support</h3>
             <p>Our team is always ready to assist you with any questions or issues.</p>
           </div>
+=======
+        
+        <div className="prop-box">
+              <div className="own-box">
+                <div className="btn-own">
+                    <button onClick={handleCreate}>Create Property</button>
+                    <button onClick={handleView}>View Your Property</button>
+                </div>
+                <div className="owner-dash">
+                    <h2 className="text-gray-900 dark:text-white font-bold text-3xl mt-4 text-center">DashBoard</h2>
+                </div>
+              </div>
+
         </div>
       </section>
 

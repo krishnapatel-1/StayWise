@@ -6,15 +6,6 @@ function MyProperty() {
   const [properties, setProperties] = useState([]);
   const [loading,setLoading]=useState(true);
   const navigate = useNavigate();
-
-  const dummyRooms = [
-    { location: "Gole ka mandir", duration: 500, range: 8000, category: "single", active: true },
-    { location: "Gole ka mandir", duration: 100, range: 4000, category: "single", active: false },
-    { location: "Gole ka mandir", duration: 1000, range: 8000000, category: "house", active: true },
-    { location: "Pragati Vihar", duration: 500, range: 10000, category: "double", active: false },
-    { location: "City Center", duration: 100, range: 15000, category: "3bhk", active: true },
-  ];
-
   const [one, setOne] = useState(false);
   const ownerId = localStorage.getItem("ownerId");
 
@@ -45,8 +36,8 @@ function MyProperty() {
     return front?.base64 || null;
   };
 
-  const availableRealRooms = properties.filter(p => p.toLet==true);
-  const availableDummyRooms = properties.filter((room) => room);
+  const availableRealRooms = properties.filter(p => p.toLet=='Yes');
+  const inactiveRooms = properties.filter(p => p.toLet=='No');
 
   // console.log("✅ Fetched Properties:", properties);
   // console.log("🟢 Showing:", availableRealRooms);
@@ -72,13 +63,11 @@ function MyProperty() {
         <div className="prop-box1">
           <h2 className="tx">Your Active Properties:</h2>
           {loading?(
-            <div className="load">
-              Loading Please Wait...
-            </div>
+            <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
               {availableRealRooms.length==0?(
-                <div className="load">
+                <div className="loader">
                   No Active Property Currently!
                 </div>
               ):(availableRealRooms.map((room, index) => (
@@ -103,18 +92,16 @@ function MyProperty() {
 
         {/* All Real Properties */}
         <div className="prop-box1">
-          <h2 className="tx">All Properties:</h2>
+          <h2 className="tx">Inactive Properties:</h2>
           {loading?(
-            <div className="load">
-              Loading Please Wait...
-            </div>
+            <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
-              {properties.length==0?(
+              {inactiveRooms.length==0?(
                 <div className="load">
                   No Property Created...
                 </div>
-              ):(properties.map((room, index) => (
+              ):(inactiveRooms.map((room, index) => (
                 <div className="room-nbox" key={room._id || index}>
                   <h2>Property {index + 1}</h2>
                   {getFrontImageUrl(room) ? (
@@ -130,25 +117,6 @@ function MyProperty() {
                   <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
               )))}
-            </div>
-          )}
-        </div>
-
-        {/* Dummy Properties */}
-        <div className="prop-box1">
-          <h2 className="tx">All Dummy Rooms:</h2>
-          {!one && (
-            <div className="prop-collection">
-              {dummyRooms.map((room, index) => (
-                <div className="room-nbox" key={index}>
-                  <h2>Room no. {index + 1}</h2>
-                  <div className="photo placeholder">No Image</div>
-                  <p><strong>Location:</strong> {room.location}</p>
-                  <p><strong>Duration:</strong> {room.duration}</p>
-                  <p><strong>Range:</strong> ₹{room.range}</p>
-                  <p><strong>Category:</strong> {room.category}</p>
-                </div>
-              ))}
             </div>
           )}
         </div>
