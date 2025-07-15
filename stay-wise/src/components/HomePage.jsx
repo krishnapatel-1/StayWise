@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import './HomePage.css';
 
 
@@ -16,9 +16,6 @@ function Home(){
     const [navbarSuggestions, setNavbarSuggestions] = useState([]);
     const navigate=useNavigate();
 
-
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setReq((prev) => ({ ...prev, [name]: value }));
@@ -30,21 +27,6 @@ function Home(){
     navigate('/matched');
   };
 
-// <<<<<<< main
-//   return (
-//     <div className="home-page">
-//       <nav className="navbar">
-//         <h1 className="logo" onClick={() => navigate('/home')}>StayWise</h1>
-//         <div className="nav-actions">
-//           <button onClick={() => navigate('/rooms')}>Rooms</button>
-//           <button onClick={() => navigate('/profile')}>Profile</button>
-// =======
-    const handleProceed = (e)=>{
-      e.preventDefault();
-      localStorage.setItem('req',JSON.stringify(req));
-      navigate('/matched');  
-    }
-
     const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
@@ -53,6 +35,10 @@ function Home(){
 
     const showrooms=()=>{
       navigate('/rooms')
+    }
+
+    const gotoprof=()=>{
+      navigate('/profile')
     }
 
     useEffect(() => {
@@ -79,7 +65,7 @@ function Home(){
     return (
     <div className="home-page">
       <nav className="navbar">
-        <h2 onClick={handleHome}>StayWise</h2>
+        <h2>StayWise</h2>
           {/*<input type="text" placeholder="Search..." className="search-input" />*/}
           <div style={{ position: 'relative', width: '250px' }}>
               <input
@@ -120,7 +106,6 @@ function Home(){
         <div>
         <button className="profile-btn" onClick={showrooms}>All Rooms</button>
         <button className="profile-btn" onClick={gotoprof}>Profile</button>
-// >>>>>>> main
         </div>
       </nav>
 
