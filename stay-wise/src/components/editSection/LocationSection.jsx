@@ -1,6 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
+  // Ensure location object is initialized
+  useEffect(() => {
+    if (!formData.location) {
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          houseNo: "",
+          street: "",
+          city: "",
+          district: "",
+          state: "",
+          country: "",
+          pincode: "",
+          latitude: "",
+          longitude: "",
+        },
+      }));
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -14,45 +34,46 @@ const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
   };
 
   const detectLocation = () => {
-  if (!navigator.geolocation) {
-    alert("Geolocation not supported");
-    return;
-  }
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
 
-  navigator.geolocation.getCurrentPosition(
-        async (position) => {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
-            const data = await res.json();
-            const address = data.address;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await res.json();
+          const address = data.address;
 
-            setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             location: {
-                ...prev.location,
-                latitude,
-                longitude,
-                street: address.road || "",
-                city: address.city || address.town || "",
-                district: address.county || "",
-                state: address.state || "",
-                country: address.country || "",
-                pincode: address.postcode || "",
+              ...prev.location,
+              latitude,
+              longitude,
+              street: address.road || "",
+              city: address.city || address.town || "",
+              district: address.county || "",
+              state: address.state || "",
+              country: address.country || "",
+              pincode: address.postcode || "",
             },
-            }));
+          }));
         } catch (err) {
-            console.error("Reverse geocoding failed:", err);
-            alert("Failed to fetch address from coordinates.");
+          console.error("Reverse geocoding failed:", err);
+          alert("Failed to fetch address from coordinates.");
         }
-        },
-        (err) => {
+      },
+      (err) => {
         console.error("Geolocation error:", err);
         alert("Location detection failed.");
-        }
+      }
     );
-    };
-
+  };
 
   return (
     <div className="section-container">

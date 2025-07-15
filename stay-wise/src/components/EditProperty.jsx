@@ -21,7 +21,6 @@ function EditProperty() {
         const res = await fetch(`http://localhost:4000/api/properties/${propertyId}`);
         const data = await res.json();
         if (res.ok) {
-            console.log("Fetched property data:", data);
           setFormData({
             ...data,
             propertyType: data.propertyType?.toLowerCase() || "",
@@ -36,10 +35,6 @@ function EditProperty() {
     };
     fetchProperty();
   }, [propertyId]);
-
-  const handleChange = (updatedFields) => {
-    setFormData((prev) => ({ ...prev, ...updatedFields }));
-  };
 
   const handleNext = () => setCurrentStep((prev) => prev + 1);
   const handleBack = () => setCurrentStep((prev) => prev - 1);
@@ -72,27 +67,27 @@ function EditProperty() {
   const steps = [
     <GeneralSection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       key="general"
     />,
     <PhotoSection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       onBack={handleBack}
       key="photos"
     />,
     <UtilitySection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       onBack={handleBack}
       key="utilities"
     />,
     <FacilitiesSection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       onBack={handleBack}
       key="facilities"
@@ -100,7 +95,7 @@ function EditProperty() {
     ...(isPGorHostel ? [
       <ServicesSection
         formData={formData}
-        onChange={handleChange}
+        setFormData={setFormData}
         onNext={handleNext}
         onBack={handleBack}
         key="services"
@@ -108,14 +103,14 @@ function EditProperty() {
     ] : []),
     <LocationSection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       onBack={handleBack}
       key="location"
     />,
     <PricingSection
       formData={formData}
-      onChange={handleChange}
+      setFormData={setFormData}
       onNext={handleNext}
       onBack={handleBack}
       key="pricing"

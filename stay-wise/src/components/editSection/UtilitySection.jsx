@@ -1,14 +1,21 @@
 import React from "react";
+import "./UtilitySection.css";
 
-const UtilitySection = ({ formData, onChange, onNext, onBack }) => {
+const UtilitySection = ({ formData, setFormData, onNext, onBack }) => {
   const handleSelectChange = (e) => {
     const { name, value } = e.target;
-    onChange({ [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-    onChange({ [name]: checked });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
   return (

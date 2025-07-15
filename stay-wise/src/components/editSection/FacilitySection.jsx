@@ -1,26 +1,31 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const FacilitiesSection = ({ formData, setFormData, onNext, onBack }) => {
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    if (type === 'checkbox') {
+  // Ensure facilities field is initialized
+  useEffect(() => {
+    if (!formData.facilities) {
       setFormData((prev) => ({
         ...prev,
         facilities: {
-          ...prev.facilities,
-          [name]: checked,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        facilities: {
-          ...prev.facilities,
-          [name]: value,
+          parking: '',
+          cctv: false,
+          guard: false,
+          lift: false,
         },
       }));
     }
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      facilities: {
+        ...prev.facilities,
+        [name]: type === 'checkbox' ? checked : value,
+      },
+    }));
   };
 
   return (

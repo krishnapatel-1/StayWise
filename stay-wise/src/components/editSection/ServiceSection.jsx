@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const ServicesSection = ({ formData, setFormData, onNext, onBack }) => {
+  // Ensure services object is initialized
+  useEffect(() => {
+    if (!formData.services) {
+      setFormData((prev) => ({
+        ...prev,
+        services: {
+          mealsIncluded: "",
+          gateOpen: "",
+          gateClose: "",
+          housekeeping: "",
+          laundry: false,
+        },
+      }));
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       services: {

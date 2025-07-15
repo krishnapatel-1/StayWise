@@ -15,7 +15,7 @@ function Rooms(){
     const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
-      navigate(/rooms?location=${encodeURIComponent(location)});
+      navigate(`/rooms?location=${encodeURIComponent(location)}`);
     };
     
         useEffect(() => {
@@ -166,7 +166,7 @@ function Rooms(){
                   <p><strong>Type:</strong> {room.propertyType}</p>
                   <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
 
-                  <button onClick={() => navigate(/property/${room._id})}>View</button>
+                  <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
               )))}
             </div>

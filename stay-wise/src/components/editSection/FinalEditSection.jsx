@@ -3,15 +3,6 @@ import React, { useState } from "react";
 const FinalEditSection = ({ formData, onBack, onSubmit }) => {
   const [toLet, setToLet] = useState(formData.toLet ?? "Yes");
 
-  const handleSubmit = () => {
-    const updatedFormData = {
-      ...formData,
-      toLet,
-    };
-
-    onSubmit(updatedFormData); // pass data back to EditProperty
-  };
-
   const {
     propertyType,
     totalArea,
@@ -39,10 +30,39 @@ const FinalEditSection = ({ formData, onBack, onSubmit }) => {
     negotiable,
     pricingNote,
     houseFloorDetails = [],
+    photos = [],
   } = formData;
 
   const isHouse = propertyType?.toLowerCase() === "house";
   const isPGOrHostel = propertyType === "pg room" || propertyType === "hostel room";
+
+  // 🧹 Filter floors that are valid (non-empty)
+  const filteredFloors = houseFloorDetails.filter(
+    floor =>
+      floor.bedrooms || floor.bathrooms || floor.kitchens || floor.halls || floor.balconies
+  );
+
+  // 🧹 Filter photos that belong to retained floors or standard labels
+  const filteredPhotos = Array.isArray(photos)
+    ? photos.filter(photo => {
+        if (!photo.label) return false;
+        if (!isHouse) return true;
+        return (
+          photo.label === "Property Front View" ||
+          filteredFloors.some((_, i) => photo.label.startsWith(`Floor ${i + 1}`))
+        );
+      })
+    : [];
+
+  const handleSubmit = () => {
+    const updatedFormData = {
+      ...formData,
+      toLet,
+      houseFloorDetails: filteredFloors,
+      photos: filteredPhotos,
+    };
+    onSubmit(updatedFormData);
+  };
 
   return (
     <div className="section-container">
@@ -61,12 +81,17 @@ const FinalEditSection = ({ formData, onBack, onSubmit }) => {
       )}
       <p><strong>Facing:</strong> {facing}</p>
 
-      {isHouse && houseFloorDetails.length > 0 && (
+      {isHouse && filteredFloors.length > 0 && (
         <>
           <h4>Floor-wise Rooms</h4>
-          {houseFloorDetails.map((floor, i) => (
+          {filteredFloors.map((floor, i) => (
             <p key={i}>
-              <strong>Floor {i + 1}</strong>: Bedrooms: {floor.bedrooms}, Bathrooms: {floor.bathrooms}, Kitchens: {floor.kitchens}, Halls: {floor.halls}, Balconies: {floor.balconies}
+              <strong>Floor {i + 1}</strong>: 
+              Bedrooms: {floor.bedrooms || 0}, 
+              Bathrooms: {floor.bathrooms || 0}, 
+              Kitchens: {floor.kitchens || 0}, 
+              Halls: {floor.halls || 0}, 
+              Balconies: {floor.balconies || 0}
             </p>
           ))}
         </>
@@ -107,6 +132,24 @@ const FinalEditSection = ({ formData, onBack, onSubmit }) => {
       <p><strong>State:</strong> {location.state}</p>
       <p><strong>Country:</strong> {location.country}</p>
       <p><strong>Pincode:</strong> {location.pincode}</p>
+
+      {filteredPhotos.length > 0 && (
+        <>
+          <h3>Photos</h3>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+            {filteredPhotos.map((photo, index) => (
+              <div key={index} style={{ textAlign: "center" }}>
+                <p><strong>{photo.label}</strong></p>
+                <img
+                  src={photo.base64}
+                  alt={photo.label}
+                  style={{ width: "200px", borderRadius: "8px", border: "1px solid #ccc" }}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <h3>Pricing</h3>
       {dailyRent && <p><strong>Daily Rent:</strong> ₹{dailyRent}</p>}
