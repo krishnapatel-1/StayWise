@@ -317,4 +317,5 @@ button:focus-visible {
 .showing{
   margin-left: 64px;
   font-size: larger;
+  color: white;
 }
