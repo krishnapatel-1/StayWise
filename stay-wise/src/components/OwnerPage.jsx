@@ -28,8 +28,8 @@ export default function Owner() {
         <h1>Welcome to StayWise</h1>
         <p>Get Tenants without any effort</p>
       </div>
-// <<<<<<< main
 
+{/*
 //       <div className="prop-box">
 //         <div className="own-box">
 //           <div className="btn-own">
@@ -66,8 +66,7 @@ export default function Owner() {
             <h3>24/7 Support</h3>
             <p>Our team is always ready to assist you with any questions or issues.</p>
           </div>
-=======
-        
+        </div>
         <div className="prop-box">
               <div className="own-box">
                 <div className="btn-own">
