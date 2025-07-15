@@ -16,12 +16,10 @@ import OwnProfile from './components/OwnerProfile';
 import Property from './components/myProperty';
 import ViewProperty from "./components/ViewProperty";
 import ThemeToggle from './components/ThemeToggle';
-
+import SearchRooms from './components/SearchRoom';
 // import Landing from './components/Landing';
-
-
-
 import './App.css';
+
 
 function AppContent() {
   const location = useLocation();
@@ -64,6 +62,7 @@ function AppContent() {
         <Route path="/my-property" element={<Property />} />
         <Route path="/property/:propertyId" element={<ViewProperty />} />
         <Route path="*" element={<LandingPage />} />
+        <Route path='/search' element={<SearchRooms/>} />
         {/* <Route path="/" element={<Landing />} /> */}
       </Routes>
     </>

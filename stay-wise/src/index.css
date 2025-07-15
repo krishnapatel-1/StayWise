@@ -313,3 +313,8 @@ button:focus-visible {
   transform: scale(1.05);
   background-color: var(--card-bg);
 }
+
+.showing{
+  margin-left: 64px;
+  font-size: larger;
+}
