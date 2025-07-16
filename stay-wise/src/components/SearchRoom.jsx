@@ -1,11 +1,13 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useSearchParams} from "react-router-dom";
 import { useState,useEffect} from "react";
 
-function Rooms(){
+function SearchRooms(){
     const [rooms,setRooms]=useState([]);
     const [loading,setLoading]=useState(true);
     const [navbarSearch, setNavbarSearch] = useState('');
     const [navbarSuggestions, setNavbarSuggestions] = useState([]);
+    const [searchParams] = useSearchParams();
+    const locationParam = searchParams.get("location");
     
     const handleChange = (e)=>{
       const {name,value}=e.target;
@@ -15,7 +17,7 @@ function Rooms(){
     const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
-      navigate(`/rooms?location=${encodeURIComponent(location)}`);
+      navigate(`/search?location=${encodeURIComponent(location)}`);
     };
     
         useEffect(() => {
@@ -26,11 +28,12 @@ function Rooms(){
               }
       
               try {
-                const res = await fetch("http://localhost:4000/api/locations?q=${navbarSearch}");
+                const res = await fetch(`http://localhost:4000/api/locations?q=${navbarSearch}`);
                 const data = await res.json();
                 console.log("🔍 Location suggestions from backend:", data);
                 setNavbarSuggestions(data);
               } catch (err) {
+                setLoading(false);
                 console.error('Error fetching navbar locations:', err);
               }
             };
@@ -43,8 +46,14 @@ function Rooms(){
     useEffect(()=>{
       async function fetchProperties(){
         try{
-          const res=await fetch('http://localhost:4000/api/properties/all');
-          const data=await res.json();
+          let url='http://localhost:4000/api/properties/all';
+
+          if (locationParam) {
+            url = `http://localhost:4000/api/search?location=${encodeURIComponent(locationParam)}`;
+          }
+
+          const res = await fetch(url);
+          const data = await res.json();
 
           if (Array.isArray(data)) {
             setRooms(data);
@@ -58,7 +67,7 @@ function Rooms(){
         }
       }
       fetchProperties();
-    },[])
+    },[locationParam])
 
     const activeRooms=rooms.filter((room)=>room.toLet==='Yes')
     const [one,setOne]=useState(false);
@@ -142,6 +151,12 @@ function Rooms(){
         <p>All the available Rooms</p>
       </div>
      
+        {locationParam && (
+            <div className="showing">
+                Showing results for: <strong>{locationParam}</strong>
+            </div>
+            )}
+
       {!one && <div className="prop-container">
         <div className="prop-box1">
           <h2 className="tx">All Properties:</h2>
@@ -194,4 +209,4 @@ function Rooms(){
   );
 }
 
-export default Rooms;
+export default SearchRooms;

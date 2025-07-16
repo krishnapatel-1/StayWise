@@ -1,0 +1,65 @@
+/* EditProperty.css */
+
+.edit-property-wrapper {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-property-wrapper h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: #444;
+}
+
+.edit-form input[type="text"],
+.edit-form input[type="file"] {
+  padding: 0.6rem;
+  margin-top: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+.edit-form img {
+  width: 200px;
+  height: auto;
+  object-fit: cover;
+  margin-top: 0.6rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.edit-form button[type="submit"] {
+  align-self: flex-start;
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-form button[type="submit"]:hover {
+  background-color: #0056b3;
+}

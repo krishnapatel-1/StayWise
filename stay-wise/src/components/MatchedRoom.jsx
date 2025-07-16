@@ -85,7 +85,7 @@ function Matched() {
       {loading?(
         <div className="manage-room">
           <div className="room-box">
-                <p>Loading...</p>
+                <div className="loader-container"><div className="loader"></div></div>
           </div>
         </div>
       ):(<div className="manage-room">

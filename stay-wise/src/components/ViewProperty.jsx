@@ -132,6 +132,10 @@ function ViewProperty() {
         </>
       )}
 
+      <button onClick={() => navigate(`/edit-property/${property._id}`)} style={{marginLeft: "10px"}}>
+        Edit Details
+      </button>
+
       <h3>Location</h3>
       <p><strong>City:</strong> {location.city}</p>
       <p><strong>Street:</strong> {location.street}</p>
@@ -145,6 +149,29 @@ function ViewProperty() {
         lat={parseFloat(location.latitude)}
         lng={parseFloat(location.longitude)}
       /> */} 
+
+    {/* Static Map Preview for Owners */}
+{isOwner && isLoaded && location.latitude && location.longitude && (
+  <div className="map-wrapper">
+    <h3>📌 Property Location Preview</h3>
+    <GoogleMap
+      mapContainerStyle={{ width: "100%", height: "400px" }}
+      center={{
+        lat: parseFloat(location.latitude),
+        lng: parseFloat(location.longitude),
+      }}
+      zoom={15}
+    >
+      <Marker
+        position={{
+          lat: parseFloat(location.latitude),
+          lng: parseFloat(location.longitude),
+        }}
+      />
+    </GoogleMap>
+  </div>
+)}
+  
 {/* 👉this is the second map preview for customer */}
 
       {/* Route Map with Draggable Origin for Customers */}
@@ -231,5 +258,7 @@ function ViewProperty() {
     </div>
   );
 }
+
+
 
 export default ViewProperty;

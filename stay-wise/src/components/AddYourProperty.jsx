@@ -10,6 +10,7 @@ import FinalSection from './FinalSection';
 import { useNavigate } from 'react-router-dom';
 import './AddYourProperty.css';
 
+
 const AddYourProperty = () => {
   const [formData, setFormData] = useState({});
   const [currentSection, setCurrentSection] = useState(0);
