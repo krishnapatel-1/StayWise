@@ -1,12 +1,13 @@
 .signup-container {
     display: flex;
     height: 100vh;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fafafa;
 }
 
 .left-panel {
     flex: 1;
-    background-color: #f4f4f4;
+    background-color: #eef2f7;
     padding: 40px;
     text-align: center;
     display: flex;
@@ -17,21 +18,32 @@
 .logo {
     width: 120px;
     height: auto;
-    margin-bottom: 20px;
+    margin: 0 auto 20px;
 }
 
 .company-name {
     font-size: 28px;
     font-weight: bold;
-    color: #333;
+    color: #2c3e50;
 }
 
 .right-panel {
     flex: 1;
-    padding: 60px;
+    padding: 60px 40px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+.right-panel h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #333;
+    width: 100%;
+    text-align: left;
 }
 
 .signup-form {
@@ -41,20 +53,124 @@
     gap: 15px;
 }
 
-.signup-form input {
+.signup-form input,
+.signup-form select {
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.signup-form select {
+    background-color: #fff;
+}
+
+.email-otp-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.email-otp-group input {
+    flex: 1;
+}
+
+.email-otp-group button,
+.otp-verification button {
+    padding: 10px 16px;
+    font-size: 14px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+.email-otp-group button:hover,
+.otp-verification button:hover {
+    background-color: #0056b3;
+}
+
+.otp-verification {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.otp-verification input {
+    flex: 1;
     padding: 10px;
-    font-size: 16px;
-    border: 1px solid #aaa;
+    font-size: 15px;
+    border: 1px solid #ccc;
     border-radius: 4px;
 }
 
 .button-group {
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
 }
 
 .button-group button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 12px 24px;
+    font-size: 15px;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    color: white;
     cursor: pointer;
 }
+
+.button-group button:first-child {
+    background-color: #6c757d;
+}
+
+.button-group button:hover {
+    opacity: 0.9;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .signup-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .left-panel,
+    .right-panel {
+        flex: none;
+        padding: 30px;
+    }
+
+    .signup-form {
+        max-width: 100%;
+    }
+
+    .email-otp-group,
+    .otp-verification {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.otp-verification {
+  margin-top: 10px;
+}
+
+.otp-boxes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.otp-boxes input {
+  width: 40px;
+  height: 45px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+

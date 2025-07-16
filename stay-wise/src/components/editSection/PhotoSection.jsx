@@ -42,9 +42,11 @@ const PhotoSection = ({ formData, setFormData, onNext, onBack }) => {
           labels.push("Property");
       }
 
-      const balconyCount = parseInt(formData.balconyCount || 0);
-      for (let i = 1; i <= balconyCount; i++) {
-        labels.push(`Balcony ${i}`);
+      if (formData.balcony === "Yes") {
+        const balconyCount = parseInt(formData.balconyCount || 0);
+        for (let i = 1; i <= balconyCount; i++) {
+          labels.push(`Balcony ${i}`);
+        }
       }
     }
 

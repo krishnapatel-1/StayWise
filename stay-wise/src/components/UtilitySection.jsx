@@ -1,16 +1,18 @@
-import React from "react";
+import React from 'react';
+import './UtilitySection.css';
 
-function UtilitySection({ formData, onChange, onNext, onBack }) {
+const UtilitySection = ({ formData, setFormData, onBack, onNext }) => {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    onChange({
-      [name]: type === "checkbox" ? checked : value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   return (
     <div className="section-container">
-      <h2>Edit Utilities</h2>
+      <h2>Utilities</h2>
 
       <label>Electricity:</label>
       <select name="electricity" value={formData.electricity || ''} onChange={handleChange}>
@@ -26,34 +28,90 @@ function UtilitySection({ formData, onChange, onNext, onBack }) {
         <option value="limited">Limited</option>
       </select>
 
-      <label>
-        <input type="checkbox" name="wifi" checked={formData.wifi || false} onChange={handleChange} />
-        Wi-Fi
-      </label>
-      <label>
-        <input type="checkbox" name="ac" checked={formData.ac || false} onChange={handleChange} />
-        Air Conditioning
-      </label>
-      <label>
-        <input type="checkbox" name="fans" checked={formData.fans || false} onChange={handleChange} />
-        Fans
-      </label>
-      <label>
-        <input type="checkbox" name="geyser" checked={formData.geyser || false} onChange={handleChange} />
-        Geyser
-      </label>
-      <label>
-        <input type="checkbox" name="refrigerator" checked={formData.refrigerator || false} onChange={handleChange} />
-        Refrigerator
-      </label>
-      <label>
-        <input type="checkbox" name="washingMachine" checked={formData.washingMachine || false} onChange={handleChange} />
-        Washing Machine
-      </label>
-      <label>
-        <input type="checkbox" name="powerBackup" checked={formData.powerBackup || false} onChange={handleChange} />
-        Power Backup
-      </label>
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Wi-Fi Available
+            <input
+            type="checkbox"
+            name="wifi"
+            checked={formData.wifi || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Air Conditioning
+            <input
+            type="checkbox"
+            name="ac"
+            checked={formData.ac || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Fans
+            <input
+            type="checkbox"
+            name="fans"
+            checked={formData.fans || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Geyser
+            <input
+            type="checkbox"
+            name="geyser"
+            checked={formData.geyser || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Refrigerator
+            <input
+            type="checkbox"
+            name="refrigerator"
+            checked={formData.refrigerator || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+        <div className="checkbox-field">
+        <label className="clickable-label">
+            Washing Machine
+            <input
+            type="checkbox"
+            name="washingMachine"
+            checked={formData.washingMachine || false}
+            onChange={handleChange}
+            />
+        </label>
+        </div>
+
+<div className="checkbox-field">
+  <label className="clickable-label">
+    Power Backup
+    <input
+      type="checkbox"
+      name="powerBackup"
+      checked={formData.powerBackup || false}
+      onChange={handleChange}
+    />
+  </label>
+</div>
+
 
       <div className="navigation-buttons">
         <button onClick={onBack}>Back</button>
@@ -61,6 +119,6 @@ function UtilitySection({ formData, onChange, onNext, onBack }) {
       </div>
     </div>
   );
-}
+};
 
 export default UtilitySection;

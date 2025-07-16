@@ -44,15 +44,23 @@ const FinalEditSection = ({ formData, onBack, onSubmit }) => {
 
   // 🧹 Filter photos that belong to retained floors or standard labels
   const filteredPhotos = Array.isArray(photos)
-    ? photos.filter(photo => {
-        if (!photo.label) return false;
-        if (!isHouse) return true;
-        return (
-          photo.label === "Property Front View" ||
-          filteredFloors.some((_, i) => photo.label.startsWith(`Floor ${i + 1}`))
-        );
-      })
-    : [];
+  ? photos.filter(photo => {
+      if (!photo.label) return false;
+
+      const isBalconyPhoto = photo.label.toLowerCase().includes("balcony");
+
+      if (!isHouse) {
+        if (isBalconyPhoto && balcony !== "Yes") return false;
+        return true;
+      }
+
+      return (
+        photo.label === "Property Front View" ||
+        filteredFloors.some((_, i) => photo.label.startsWith(`Floor ${i + 1}`))
+      );
+    })
+  : [];
+
 
   const handleSubmit = () => {
     const updatedFormData = {
