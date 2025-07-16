@@ -1,30 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ViewProperty.css";
+import PropertyMapPreview from "../components/PropertyMapPreview";
+import {
+  GoogleMap,
+  Marker,
+  DirectionsRenderer,
+  useLoadScript,
+} from "@react-google-maps/api";
 
 function ViewProperty() {
   const { propertyId } = useParams();
+  const navigate = useNavigate();
+
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [directions, setDirections] = useState(null);
+  const [userLocation, setUserLocation] = useState(null); // Origin
+  const [destination, setDestination] = useState(null);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isCustomer = user?.role === "customer";
+  const isOwner = user?.role === "owner";
+  const storedCoords = JSON.parse(localStorage.getItem("userLocation"));
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  });
+
+  const calculateRoute = useCallback(
+    (origin) => {
+      if (!destination || !isLoaded) return;
+
+      const directionsService = new window.google.maps.DirectionsService();
+      directionsService.route(
+        {
+          origin,
+          destination,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === "OK") {
+            setDirections(result);
+            setUserLocation(origin);
+          } else {
+            console.error("Directions request failed:", status);
+          }
+        }
+      );
+    },
+    [destination, isLoaded]
+  );
 
   const fetchProperty = async () => {
     try {
       const res = await fetch(`http://localhost:4000/api/properties/${propertyId}`);
       const data = await res.json();
       setProperty(data);
-    } catch (error) {
-      console.error("❌ Error fetching property:", error);
+
+      if (isCustomer && data.location?.latitude && data.location?.longitude) {
+        const dest = {
+          lat: parseFloat(data.location.latitude),
+          lng: parseFloat(data.location.longitude),
+        };
+        setDestination(dest);
+
+        if (storedCoords) {
+          calculateRoute(storedCoords);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching property:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (propertyId) {
-      fetchProperty();
-    }
-  }, [propertyId]);
+    if (propertyId && isLoaded) fetchProperty();
+  }, [propertyId, isLoaded]);
 
   const toggleToLet = async () => {
     try {
@@ -33,9 +87,9 @@ function ViewProperty() {
       });
       const data = await res.json();
       alert(data.message);
-      fetchProperty(); // Refresh after toggle
+      fetchProperty();
     } catch (err) {
-      console.error("❌ Error toggling To-Let:", err);
+      console.error("Error toggling To-Let:", err);
     }
   };
 
@@ -47,30 +101,11 @@ function ViewProperty() {
     totalArea,
     toLet,
     location = {},
-    photos = [],
     furnishing,
     floorNumber,
     balcony,
     balconyCount,
     facing,
-    electricity,
-    waterSupply,
-    wifi,
-    ac,
-    fans,
-    geyser,
-    refrigerator,
-    washingMachine,
-    powerBackup,
-    facilities = {},
-    services = {},
-    dailyRent,
-    monthlyRent,
-    securityDeposit,
-    maintenanceCharges,
-    negotiable,
-    pricingNote,
-    houseFloorDetails = [],
   } = property;
 
   return (
@@ -83,13 +118,19 @@ function ViewProperty() {
       <p><strong>Floor Number:</strong> {floorNumber}</p>
       <p><strong>Balcony:</strong> {balcony} {balcony === "Yes" ? `(${balconyCount})` : ""}</p>
       <p><strong>Facing:</strong> {facing}</p>
-      <p><strong>To-Let Status:</strong> {toLet}</p>
-      <button onClick={toggleToLet}>
-        Toggle To-Let
-      </button>
-      <button onClick={() => navigate("/my-property")} style={{ backgroundColor: "#dc3545", marginLeft: "10px" }}>
-        Close
-      </button>
+      <p><strong>To‑Let Status:</strong> {toLet}</p>
+
+      {isOwner && (
+        <>
+          <button onClick={toggleToLet}>Toggle To‑Let</button>
+          <button
+            onClick={() => navigate("/my-property")}
+            style={{ backgroundColor: "#dc3545", marginLeft: "10px" }}
+          >
+            Close
+          </button>
+        </>
+      )}
 
       <h3>Location</h3>
       <p><strong>City:</strong> {location.city}</p>
@@ -98,62 +139,95 @@ function ViewProperty() {
       <p><strong>State:</strong> {location.state}</p>
       <p><strong>Country:</strong> {location.country}</p>
 
-      <h3>Utilities</h3>
-      <p><strong>Electricity:</strong> {electricity}</p>
-      <p><strong>Water Supply:</strong> {waterSupply}</p>
-      <p><strong>Wi-Fi:</strong> {wifi ? "Yes" : "No"}</p>
-      <p><strong>AC:</strong> {ac ? "Yes" : "No"}</p>
-      <p><strong>Fans:</strong> {fans ? "Yes" : "No"}</p>
-      <p><strong>Geyser:</strong> {geyser ? "Yes" : "No"}</p>
-      <p><strong>Refrigerator:</strong> {refrigerator ? "Yes" : "No"}</p>
-      <p><strong>Washing Machine:</strong> {washingMachine ? "Yes" : "No"}</p>
-      <p><strong>Power Backup:</strong> {powerBackup ? "Yes" : "No"}</p>
+      
+{/* <h3>Map Preview</h3>
+      <PropertyMapPreview
+        lat={parseFloat(location.latitude)}
+        lng={parseFloat(location.longitude)}
+      /> */} 
+{/* 👉this is the second map preview for customer */}
 
-      <h3>Facilities</h3>
-      <p><strong>Parking:</strong> {facilities.parking}</p>
-      <p><strong>CCTV:</strong> {facilities.cctv ? "Yes" : "No"}</p>
-      <p><strong>Security Guard:</strong> {facilities.guard ? "Yes" : "No"}</p>
-      <p><strong>Lift:</strong> {facilities.lift ? "Yes" : "No"}</p>
+      {/* Route Map with Draggable Origin for Customers */}
+      {isCustomer && isLoaded && destination && (
+  <div className="map-wrapper">
+    <h3>📍 Route from your location to property:</h3>
+    <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
+      Drag the red marker to adjust your starting point.
+    </p>
 
-      {(propertyType === "pg room" || propertyType === "hostel room") && (
-        <>
-          <h3>Services</h3>
-          <p><strong>Meals:</strong> {services.mealsIncluded}</p>
-          <p><strong>Gate Open:</strong> {services.gateOpen}</p>
-          <p><strong>Gate Close:</strong> {services.gateClose}</p>
-          <p><strong>Housekeeping:</strong> {services.housekeeping}</p>
-          <p><strong>Laundry:</strong> {services.laundry ? "Yes" : "No"}</p>
-        </>
+    {/* 👉 NEW: Use My Location Button */}
+    <button
+      onClick={() => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const currentLoc = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            calculateRoute(currentLoc);
+          },
+          (error) => {
+            alert("Unable to access location. Please allow location access.");
+            console.error(error);
+          }
+        );
+      }}
+      style={{
+        marginBottom: "10px",
+        padding: "6px 12px",
+        borderRadius: "4px",
+        backgroundColor: "#007bff",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+      }}
+    >
+      📍 Use My Current Location
+    </button>
+
+    <div className="map-container">
+      <GoogleMap
+        mapContainerClassName="map-inner"
+        zoom={14}
+        center={userLocation || destination}
+        onClick={(e) => {
+          const newOrigin = {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng(),
+          };
+          calculateRoute(newOrigin);
+        }}
+      >
+        {userLocation && (
+          <Marker
+            position={userLocation}
+            draggable
+            icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+            onDragEnd={(e) => {
+              const newOrigin = {
+                lat: e.latLng.lat(),
+                lng: e.latLng.lng(),
+              };
+              calculateRoute(newOrigin);
+            }}
+          />
+        )}
+        <Marker
+          position={destination}
+          icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+        />
+        {directions && <DirectionsRenderer directions={directions} />}
+      </GoogleMap>
+    </div>
+  </div>
+)}
+
+
+      {isCustomer && !storedCoords && (
+        <p style={{ color: "red" }}>
+          📍 Please allow location access on the home page to view directions.
+        </p>
       )}
-
-      {houseFloorDetails.length > 0 && (
-        <>
-          <h3>House Room Details Per Floor</h3>
-          {houseFloorDetails.map((floor, i) => (
-            <div key={i}>
-              <p><strong>Floor {i + 1}</strong> - Bedrooms: {floor.bedrooms}, Bathrooms: {floor.bathrooms}, Kitchens: {floor.kitchens}, Halls: {floor.halls}, Balconies: {floor.balconies}</p>
-            </div>
-          ))}
-        </>
-      )}
-
-      <h3>Pricing</h3>
-      {dailyRent && <p><strong>Daily Rent:</strong> ₹{dailyRent}</p>}
-      {monthlyRent && <p><strong>Monthly Rent:</strong> ₹{monthlyRent}</p>}
-      {securityDeposit && <p><strong>Security Deposit:</strong> ₹{securityDeposit}</p>}
-      {maintenanceCharges && <p><strong>Maintenance Charges:</strong> ₹{maintenanceCharges}</p>}
-      <p><strong>Negotiable:</strong> {negotiable ? "Yes" : "No"}</p>
-      <p><strong>Pricing Note:</strong> {pricingNote}</p>
-
-      <h3>Photos</h3>
-      <div className="photo-grid">
-        {photos.map((photo, idx) => (
-          <div className="photo-card" key={idx}>
-            <p>{photo.label}</p>
-            <img src={photo.base64} alt={photo.label} />
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

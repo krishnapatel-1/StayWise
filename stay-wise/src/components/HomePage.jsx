@@ -1,47 +1,43 @@
 import { useNavigate } from "react-router-dom";
-import { useState,useEffect} from "react";
+import { useState } from "react";
 
-function Home(){
-    const [req,setReq]=useState({
-      location: '',
-      duration: '',
-      range: '',
-      category: 'single'
-    });
-    
-    const navigate=useNavigate();
+function Home() {
+  const [req, setReq] = useState({
+    location: '',
+    duration: '',
+    range: '',
+    category: 'single',
+  });
 
-    const gotoprof=()=>{
-        navigate('/profile')
-    }
+  const navigate = useNavigate();
 
-    const handleChange = (e)=>{
-      const {name,value}=e.target;
-      setReq(prev=>({...prev,[name]: value}));
-    }
+  const gotoprof = () => {
+    navigate('/profile');
+  };
 
-    const handleHome =()=>{
-      navigate('/home')
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setReq(prev => ({ ...prev, [name]: value }));
+  };
 
-    const handleProceed = (e)=>{
-      e.preventDefault();
-      localStorage.setItem('req',JSON.stringify(req));
-      navigate('/matched');  
-    }
+  const handleProceed = (e) => {
+    e.preventDefault();
+    localStorage.setItem('req', JSON.stringify(req));
+    navigate('/matched');
+  };
 
-    const showrooms=()=>{
-      navigate('/rooms')
-    }
+  const showrooms = () => {
+    navigate('/rooms');
+  };
 
-    return (
+  return (
     <div className="home-page">
       <nav className="navbar">
-        <h2 onClick={handleHome}>StayWise</h2>
+        <h2 onClick={() => navigate("/home")}>StayWise</h2>
         <input type="text" placeholder="Search..." className="search-input" />
         <div>
-        <button className="profile-btn" onClick={showrooms}>All Rooms</button>
-        <button className="profile-btn" onClick={gotoprof}>Profile</button>
+          <button className="profile-btn" onClick={showrooms}>All Rooms</button>
+          <button className="profile-btn" onClick={gotoprof}>Profile</button>
         </div>
       </nav>
 
@@ -53,29 +49,34 @@ function Home(){
       <div className="cust-form">
         <div className="cap1">
           <h2>Location :</h2>
-          <input name="location" 
-                 onChange={handleChange}
-                 value={req.location} 
-                 placeholder="Where do you want Room"
+          <input
+            name="location"
+            onChange={handleChange}
+            value={req.location}
+            placeholder="Where do you want Room"
           />
         </div>
+
         <div className="cap1">
           <h2>Duration :</h2>
-          <input 
-              name="duration" 
-              onChange={handleChange}
-              value={req.duration}
-              placeholder="Duration of your stay(Days)"
+          <input
+            name="duration"
+            onChange={handleChange}
+            value={req.duration}
+            placeholder="Duration of your stay (Days)"
           />
         </div>
+
         <div className="cap1">
           <h2>Range :</h2>
-          <input name="range" 
-                 value={req.range}
-                 onChange={handleChange}
-                 placeholder="Your approx budget"
+          <input
+            name="range"
+            value={req.range}
+            onChange={handleChange}
+            placeholder="Your approx budget"
           />
         </div>
+
         <div className="cap1">
           <h2>Category :</h2>
           <select value={req.category} onChange={handleChange} name="category">
@@ -87,8 +88,9 @@ function Home(){
             <option value="house">House</option>
           </select>
         </div>
+
         <button onClick={handleProceed}>Click to Proceed</button>
-       </div>
+      </div>
     </div>
   );
 }
