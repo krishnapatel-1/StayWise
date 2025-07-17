@@ -73,12 +73,11 @@ button:focus-visible {
   align-items: center;
 }
 
-.navbar h2 {
-  padding: 40px;
-  font-size: xx-large;
+.staywise {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 0;
 }
 
 /* === Reusable UI === */
@@ -320,4 +319,14 @@ button:focus-visible {
   margin-left: 64px;
   font-size: larger;
   color: white;
+}
+
+.load{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: larger;
+  color: white;
+  width: 100%;
+  padding: 20px;
 }

@@ -15,7 +15,7 @@ function Rooms(){
     const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
-      navigate(`/rooms?location=${encodeURIComponent(location)}`);
+      navigate(`/search?location=${encodeURIComponent(location)}`);
     };
     
         useEffect(() => {
@@ -26,7 +26,7 @@ function Rooms(){
               }
       
               try {
-                const res = await fetch("http://localhost:4000/api/locations?q=${navbarSearch}");
+                const res = await fetch(`http://localhost:4000/api/locations?q=${navbarSearch}`);
                 const data = await res.json();
                 console.log("🔍 Location suggestions from backend:", data);
                 setNavbarSuggestions(data);
@@ -95,7 +95,7 @@ function Rooms(){
     return (
     <div className="home-page">
       <nav className="navbar">
-        <h2 onClick={handleHome}>StayWise</h2>
+        <h2 className="staywise" onClick={handleHome}>StayWise</h2>
         <div style={{ position: 'relative', width: '250px' }}>
               <input
                 type="text"
@@ -137,9 +137,8 @@ function Rooms(){
         </div>
       </nav>
 
-      <div className="home-content">
-        <h1>Welcome to StayWise</h1>
-        <p>All the available Rooms</p>
+      <div style={{display: "flex",placeItems: 'center',justifyContent: 'center',padding: "20px",marginTop:"25px",color:"#475569",fontSize:'larger'}} >
+        <p>Rooms available at different location</p>
       </div>
      
       {!one && <div className="prop-container">

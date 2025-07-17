@@ -104,7 +104,7 @@ function SearchRooms(){
     return (
     <div className="home-page">
       <nav className="navbar">
-        <h2 onClick={handleHome}>StayWise</h2>
+        <h2 className="staywise" onClick={handleHome}>StayWise</h2>
         <div style={{ position: 'relative', width: '250px' }}>
               <input
                 type="text"
@@ -146,9 +146,8 @@ function SearchRooms(){
         </div>
       </nav>
 
-      <div className="home-content">
-        <h1>Welcome to StayWise</h1>
-        <p>All the available Rooms</p>
+      <div style={{display: "flex",placeItems: 'center',justifyContent: 'center',padding: "20px",marginTop:"25px",color:"#475569",fontSize:'larger'}} >
+        <p>Rooms available at different location</p>
       </div>
      
         {locationParam && (
