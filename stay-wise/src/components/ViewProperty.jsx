@@ -132,7 +132,7 @@ function ViewProperty() {
         </>
       )}
 
-      <button onClick={() => navigate(`/edit-property/${property._id}`)} style={{marginLeft: "10px"}}>
+      <button onClick={() => navigate(`/edit-property/${property._id}`)} style={{ marginLeft: "10px" }}>
         Edit Details
       </button>
 
@@ -143,111 +143,111 @@ function ViewProperty() {
       <p><strong>State:</strong> {location.state}</p>
       <p><strong>Country:</strong> {location.country}</p>
 
-      
-{/* <h3>Map Preview</h3>
+
+      {/* <h3>Map Preview</h3>
       <PropertyMapPreview
         lat={parseFloat(location.latitude)}
         lng={parseFloat(location.longitude)}
-      /> */} 
+      /> */}
 
-    {/* Static Map Preview for Owners */}
-{isOwner && isLoaded && location.latitude && location.longitude && (
-  <div className="map-wrapper">
-    <h3>📌 Property Location Preview</h3>
-    <GoogleMap
-      mapContainerStyle={{ width: "100%", height: "400px" }}
-      center={{
-        lat: parseFloat(location.latitude),
-        lng: parseFloat(location.longitude),
-      }}
-      zoom={15}
-    >
-      <Marker
-        position={{
-          lat: parseFloat(location.latitude),
-          lng: parseFloat(location.longitude),
-        }}
-      />
-    </GoogleMap>
-  </div>
-)}
-  
-{/* 👉this is the second map preview for customer */}
+      {/* Static Map Preview for Owners */}
+      {isOwner && isLoaded && location.latitude && location.longitude && (
+        <div className="map-wrapper">
+          <h3>📌 Property Location Preview</h3>
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "400px" }}
+            center={{
+              lat: parseFloat(location.latitude),
+              lng: parseFloat(location.longitude),
+            }}
+            zoom={15}
+          >
+            <Marker
+              position={{
+                lat: parseFloat(location.latitude),
+                lng: parseFloat(location.longitude),
+              }}
+            />
+          </GoogleMap>
+        </div>
+      )}
+
+      {/* 👉this is the second map preview for customer */}
 
       {/* Route Map with Draggable Origin for Customers */}
       {isCustomer && isLoaded && destination && (
-  <div className="map-wrapper">
-    <h3>📍 Route from your location to property:</h3>
-    <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
-      Drag the red marker to adjust your starting point.
-    </p>
+        <div className="map-wrapper">
+          <h3>📍 Route from your location to property:</h3>
+          <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
+            Drag the red marker to adjust your starting point.
+          </p>
 
-    {/* 👉 NEW: Use My Location Button */}
-    <button
-      onClick={() => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const currentLoc = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            calculateRoute(currentLoc);
-          },
-          (error) => {
-            alert("Unable to access location. Please allow location access.");
-            console.error(error);
-          }
-        );
-      }}
-      style={{
-        marginBottom: "10px",
-        padding: "6px 12px",
-        borderRadius: "4px",
-        backgroundColor: "#007bff",
-        color: "white",
-        border: "none",
-        cursor: "pointer",
-      }}
-    >
-      📍 Use My Current Location
-    </button>
-
-    <div className="map-container">
-      <GoogleMap
-        mapContainerClassName="map-inner"
-        zoom={14}
-        center={userLocation || destination}
-        onClick={(e) => {
-          const newOrigin = {
-            lat: e.latLng.lat(),
-            lng: e.latLng.lng(),
-          };
-          calculateRoute(newOrigin);
-        }}
-      >
-        {userLocation && (
-          <Marker
-            position={userLocation}
-            draggable
-            icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
-            onDragEnd={(e) => {
-              const newOrigin = {
-                lat: e.latLng.lat(),
-                lng: e.latLng.lng(),
-              };
-              calculateRoute(newOrigin);
+          {/* 👉 NEW: Use My Location Button */}
+          <button
+            onClick={() => {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const currentLoc = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                  };
+                  calculateRoute(currentLoc);
+                },
+                (error) => {
+                  alert("Unable to access location. Please allow location access.");
+                  console.error(error);
+                }
+              );
             }}
-          />
-        )}
-        <Marker
-          position={destination}
-          icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
-        />
-        {directions && <DirectionsRenderer directions={directions} />}
-      </GoogleMap>
-    </div>
-  </div>
-)}
+            style={{
+              marginBottom: "10px",
+              padding: "6px 12px",
+              borderRadius: "4px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            📍 Use My Current Location
+          </button>
+
+          <div className="map-container">
+            <GoogleMap
+              mapContainerClassName="map-inner"
+              zoom={14}
+              center={userLocation || destination}
+              onClick={(e) => {
+                const newOrigin = {
+                  lat: e.latLng.lat(),
+                  lng: e.latLng.lng(),
+                };
+                calculateRoute(newOrigin);
+              }}
+            >
+              {userLocation && (
+                <Marker
+                  position={userLocation}
+                  draggable
+                  icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+                  onDragEnd={(e) => {
+                    const newOrigin = {
+                      lat: e.latLng.lat(),
+                      lng: e.latLng.lng(),
+                    };
+                    calculateRoute(newOrigin);
+                  }}
+                />
+              )}
+              <Marker
+                position={destination}
+                icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+              />
+              {directions && <DirectionsRenderer directions={directions} />}
+            </GoogleMap>
+          </div>
+        </div>
+      )}
 
 
       {isCustomer && !storedCoords && (
