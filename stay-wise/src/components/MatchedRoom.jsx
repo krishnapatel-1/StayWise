@@ -7,6 +7,12 @@ function Matched() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [fixed, setFixed] = useState(-1);
   const [req, setReq] = useState(null);
+  const [navbarSearch, setNavbarSearch] = useState('');
+  const [navbarSuggestions, setNavbarSuggestions] = useState([]);
+  
+  const gotohome=()=>{
+        navigate('/home');
+  }
 
   const navigate = useNavigate();
 
@@ -14,6 +20,34 @@ function Matched() {
     const front = property.photos?.find(p => p.label === "Property Front View");
     return front?.base64 || null;
   };
+
+  const handleNavbarSuggestionClick = (location) => {
+      setNavbarSearch(location);
+      setNavbarSuggestions([]);
+      navigate(`/search?location=${encodeURIComponent(location)}`);
+    };
+
+  useEffect(() => {
+      const fetchNavbarSuggestions = async () => {
+      if (navbarSearch.trim() === '') {
+        setNavbarSuggestions([]);
+        return;
+      }
+      
+      try {
+        const res = await fetch(`http://localhost:4000/api/locations?q=${navbarSearch}`);
+        const data = await res.json();
+        console.log("🔍 Location suggestions from backend:", data);
+        setNavbarSuggestions(data);
+      } catch (err) {
+        console.error('Error fetching navbar locations:', err);
+      }
+      };
+      
+      const timeoutId = setTimeout(fetchNavbarSuggestions, 300); // debounce
+      return () => clearTimeout(timeoutId);
+  }, [navbarSearch]);
+
 
   useEffect(() => {
     async function fetchProperties() {
@@ -53,7 +87,6 @@ function Matched() {
   const matchedLoc = properties.filter(
     room => room.location?.city?.toLowerCase().includes(req.location?.toLowerCase())
   );
-  console.log("Filtered Matched Rooms:", matchedLoc);
   localStorage.setItem('matched', JSON.stringify(matchedLoc));
 
   const gotoprof = () => navigate('/profile');
@@ -68,67 +101,85 @@ function Matched() {
   return (
     <div className="home-page">
       <nav className="navbar">
-        <h2 onClick={handleHome}>StayWise</h2>
-        <input type="text" placeholder="Search..." className="search-input" />
+        <h2 className="staywise" onClick={handleHome}>StayWise</h2>
+        <div style={{ position: 'relative', width: '250px' }}>
+              <input
+                type="text"
+                placeholder="Search location..."
+                value={navbarSearch}
+                onChange={(e) => setNavbarSearch(e.target.value)}
+                className="search-input"
+                autoComplete="off"
+              />
+
+              {navbarSuggestions.length > 0 && (
+                  <ul style={{
+                    position: "absolute",
+                    background: "white",
+                    border: "1px solid #ccc",
+                    zIndex: 20,
+                    width: "100%",
+                    maxHeight: "150px",
+                    overflowY: "auto",
+                    padding: 0,
+                    margin: 0,
+                    listStyle: "none"
+                  }}>
+                    {navbarSuggestions.map((loc, idx) => (
+                      <li
+                        key={idx}
+                        onClick={() => handleNavbarSuggestionClick(loc)}
+                        style={{ color:'#012525', padding: '8px', cursor: 'pointer', borderBottom: '1px solid #eee' }}
+                      >
+                        {loc}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+            </div>
         <div>
           <button className="profile-btn" onClick={showrooms}>All Rooms</button>
           <button className="profile-btn" onClick={gotoprof}>Profile</button>
         </div>
       </nav>
 
-      <div className="home-content">
-        <h1>Welcome to StayWise</h1>
+      <div style={{display: "flex",placeItems: 'center',justifyContent: 'center',padding: "20px",marginTop:"25px",color:"#475569",fontSize:'larger'}} >
         <p>Rooms that matched your Desired Location</p>
       </div>
+     
+      {<div className="prop-container">
+        <div className="prop-box1">
+          <h2 className="tx">{`Properties at ${req?.location}`}</h2>
+          {loading?(
+            <div className="loader-container"><div className="loader"></div></div>
+          ) : (
+            <div className="prop-collection">
+              {matchedLoc.length==0?(
+                <div className="load">
+                  {`No Property available at ${req?.location}`}
+                </div>
+              ):(matchedLoc.map((room, index) => (
+                <div className="room-nbox" key={room._id || index}>
+                  <h2>Property {index + 1}</h2>
+                  {getFrontImageUrl(room) ? (
+                    <img src={getFrontImageUrl(room)} alt="Front View" className="photo" />
+                  ) : (
+                    <div className="photo placeholder">No Image</div>
+                  )}
+                  <p><strong>Location:</strong> {room.location?.city}</p>
+                  <p><strong>Total Area:</strong> {room.totalArea}</p>
+                  <p><strong>Type:</strong> {room.propertyType}</p>
+                  <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
 
-      <div className="cont">
-      {loading?(
-        <div className="manage-room">
-          <div className="room-box">
-                <div className="loader-container"><div className="loader"></div></div>
-          </div>
-        </div>
-      ):(<div className="manage-room">
-        <div>
-          {matchedLoc.length > 0 && selectedIndex !== null && matchedLoc[selectedIndex] && (
-            <div className="room">
-              <h2>Rooms {selectedIndex + 1} Details :</h2>
-              {getFrontImageUrl(matchedLoc[selectedIndex]) ? (
-                <img
-                  src={getFrontImageUrl(matchedLoc[selectedIndex])}
-                  alt="Room"
-                  className="photo"
-                />
-              ) : (
-                <div className="photo placeholder">No Image</div>
-              )}
-              <p><strong>Location:</strong> {matchedLoc[selectedIndex].location?.city}</p>
-              <p><strong>Price:</strong> ₹{matchedLoc[selectedIndex].monthlyRent}</p>
-              <p><strong>Type:</strong> {matchedLoc[selectedIndex].propertyType}</p>
-              <p><strong>Facing:</strong> {matchedLoc[selectedIndex].facing}</p>
+                  <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
+                </div>
+              )))}
             </div>
           )}
         </div>
-
-        <div className="room-box">
-          {matchedLoc.length > 0 ? matchedLoc.map((room, index) => (
-            <div
-              onClick={(e) => handleClick(e, index)}
-              onMouseEnter={() => setSelectedIndex(index)}
-              className="room-box-ele"
-              key={index}
-            >
-              <p><strong>Room {index + 1}</strong></p>
-              <p><strong>City:</strong> {room.location?.city}</p>
-              <p><strong>Price:</strong> ₹{room?.monthlyRent}</p>
-              <p><strong>Type:</strong> {room.propertyType}</p>
-            </div>
-          )) : (
-            <p>No Rooms Available</p>
-          )}
-        </div>
-      </div>)}
-      </div>
+      </div>}
+      <div>
+     </div>
     </div>
   );
 }

@@ -66,7 +66,7 @@ function Home(){
     <div className="home-page">
       {/* Navbar */}
       <nav className="navbar">
-        <h2>StayWise</h2>
+        <h2 className="staywise">StayWise</h2>
           {/*<input type="text" placeholder="Search..." className="search-input" />*/}
           <div style={{ position: 'relative', width: '250px' }}>
               <input
