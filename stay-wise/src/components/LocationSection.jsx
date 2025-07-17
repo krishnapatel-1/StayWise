@@ -1,58 +1,91 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
+import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
+
+const libraries = ["places"];
+const mapContainerStyle = {
+  width: "100%",
+  height: "300px",
+};
+
+const center = {
+  lat: 20.5937, // Default to center of India
+  lng: 78.9629,
+};
 
 const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const location = formData.location || {};
+  const [marker, setMarker] = useState({
+    lat: parseFloat(location.latitude) || center.lat,
+    lng: parseFloat(location.longitude) || center.lng,
+  });
 
-  const fetchLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser.");
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
+
+  const reverseGeocode = useCallback(async (lat, lng) => {
+  console.log("Reverse‑geocode called →", lat, lng);
+
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+    );
+    const data = await response.json();
+
+    if (!data.results || data.results.length === 0) {
+      console.warn("No results found for reverse geocode.");
       return;
     }
 
-    setLoading(true);
+    const components = data.results[0].address_components || [];
+
+    const getAddressComponent = (types) =>
+      components.find((c) => types.every((t) => c.types.includes(t)))?.long_name || "";
+
+    const updatedLocation = {
+      latitude: lat,
+      longitude: lng,
+      houseNo: getAddressComponent(["street_number"]),
+      street: getAddressComponent(["route"]),
+      city:
+        getAddressComponent(["locality"]) ||
+        getAddressComponent(["sublocality"]) ||
+        getAddressComponent(["administrative_area_level_2"]),
+      district: getAddressComponent(["administrative_area_level_2"]),
+      state: getAddressComponent(["administrative_area_level_1"]),
+      country: getAddressComponent(["country"]),
+      pincode: getAddressComponent(["postal_code"]),
+    };
+
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        ...prev.location,
+        ...updatedLocation,
+      },
+    }));
+  } catch (err) {
+    console.error("Reverse geocoding failed", err);
+  }
+}, [setFormData]);
+
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation not supported.");
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        // alert(`📍 Location fetched!\nLatitude: ${latitude}\nLongitude: ${longitude}\nAccuracy: ${accuracy.toFixed(2)} meters`);
-
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-          );
-          const data = await response.json();
-
-          const updatedLocation = {
-            latitude,
-            longitude,
-            houseNo: "",
-            street: data.address.road || "",
-            city: data.address.city || data.address.town || data.address.village || "",
-            district: data.address.county || "",
-            state: data.address.state || "",
-            country: data.address.country || "India",
-            pincode: data.address.postcode || "",
-          };
-
-          setFormData((prev) => ({
-            ...prev,
-            location: updatedLocation,
-          }));
-
-          setError("");
-        } catch (err) {
-          console.error(err);
-          setError("Failed to fetch address.");
-        }
-
-        setLoading(false);
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setMarker({ lat, lng });
+        reverseGeocode(lat, lng);
       },
-      (err) => {
-        console.error(err);
-        setError("Failed to get location.");
-        setLoading(false);
-      },
-      { enableHighAccuracy: true }
+      () => setError("Location access denied.")
     );
   };
 
@@ -67,24 +100,51 @@ const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
     }));
   };
 
-  const location = formData.location || {};
+  if (!isLoaded) return <p>Loading map...</p>;
 
   return (
     <div className="section-container">
-      <h2>Location</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <button onClick={fetchLocation} disabled={loading}>
-        {loading ? "Fetching..." : "Use My Location"}
-      </button>
+      <h2>📍 Location</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <button onClick={handleUseMyLocation}>Use My Location</button>
+
+      <div style={{ margin: "1rem 0" }}>
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          zoom={14}
+          center={marker}
+          onClick={(e) => {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            setMarker({ lat, lng });
+            reverseGeocode(lat, lng);
+          }}
+        >
+          <Marker
+            position={marker}
+            draggable
+            onDragEnd={(e) => {
+              const lat = e.latLng.lat();
+              const lng = e.latLng.lng();
+              setMarker({ lat, lng });
+              reverseGeocode(lat, lng);
+            }}
+          />
+        </GoogleMap>
+      </div>
 
       <label>House No:</label>
       <input name="houseNo" value={location.houseNo || ""} onChange={handleChange} />
+
       <label>Street:</label>
       <input name="street" value={location.street || ""} onChange={handleChange} />
+
       <label>City:</label>
       <input name="city" value={location.city || ""} onChange={handleChange} />
+
       <label>District:</label>
       <input name="district" value={location.district || ""} onChange={handleChange} />
+
       <label>State:</label>
       <select name="state" value={location.state || ""} onChange={handleChange}>
         <option value="">Select State</option>
@@ -98,8 +158,10 @@ const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
           <option key={state} value={state}>{state}</option>
         ))}
       </select>
+
       <label>Country:</label>
-      <input name="country" value={location.country || "India"} onChange={handleChange} readOnly />
+      <input name="country" value={location.country || "India"} onChange={handleChange} />
+
       <label>Pincode:</label>
       <input name="pincode" value={location.pincode || ""} onChange={handleChange} />
 

@@ -62,8 +62,9 @@ function Home(){
     }, [navbarSearch]);
 
 
-    return (
+  return (
     <div className="home-page">
+      {/* Navbar */}
       <nav className="navbar">
         <h2>StayWise</h2>
           {/*<input type="text" placeholder="Search..." className="search-input" />*/}
@@ -104,8 +105,8 @@ function Home(){
             </div>
 
         <div>
-        <button className="profile-btn" onClick={showrooms}>All Rooms</button>
-        <button className="profile-btn" onClick={gotoprof}>Profile</button>
+          <button className="profile-btn" onClick={showrooms}>All Rooms</button>
+          <button className="profile-btn" onClick={gotoprof}>Profile</button>
         </div>
       </nav>
 
