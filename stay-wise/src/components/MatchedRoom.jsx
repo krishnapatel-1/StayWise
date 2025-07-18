@@ -87,7 +87,6 @@ function Matched() {
   const matchedLoc = properties.filter(
     room => room.location?.city?.toLowerCase().includes(req.location?.toLowerCase())
   );
-  localStorage.setItem('matched', JSON.stringify(matchedLoc));
 
   const gotoprof = () => navigate('/profile');
   const handleHome = () => navigate('/home');
