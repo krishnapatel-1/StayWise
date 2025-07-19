@@ -1,29 +1,113 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { GoogleMap, Marker, useLoadScript, Autocomplete } from "@react-google-maps/api";
+
+const libraries = ["places"];
+const mapContainerStyle = {
+  width: "100%",
+  height: "300px",
+};
+
+const defaultCenter = {
+  lat: 20.5937,
+  lng: 78.9629,
+};
 
 const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
-  // Ensure location object is initialized
-  useEffect(() => {
-    if (!formData.location) {
+  const [error, setError] = useState("");
+  const [markerPlaced, setMarkerPlaced] = useState(false);
+  const [mapRef, setMapRef] = useState(null);
+  const [marker, setMarker] = useState({
+    lat: parseFloat(formData?.location?.latitude) || defaultCenter.lat,
+    lng: parseFloat(formData?.location?.longitude) || defaultCenter.lng,
+  });
+
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
+
+  const location = formData.location || {};
+
+  const reverseGeocode = useCallback(async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+      );
+      const data = await response.json();
+
+      if (!data.results || data.results.length === 0) return;
+
+      const components = data.results[0].address_components;
+
+      const getAddressComponent = (types) =>
+        components.find((c) => types.every((t) => c.types.includes(t)))?.long_name || "";
+
+      const updatedLocation = {
+        latitude: lat,
+        longitude: lng,
+        houseNo: getAddressComponent(["street_number"]),
+        street: getAddressComponent(["route"]),
+        city:
+          getAddressComponent(["locality"]) ||
+          getAddressComponent(["sublocality"]) ||
+          getAddressComponent(["administrative_area_level_2"]),
+        district: getAddressComponent(["administrative_area_level_2"]),
+        state: getAddressComponent(["administrative_area_level_1"]),
+        country: getAddressComponent(["country"]),
+        pincode: getAddressComponent(["postal_code"]),
+      };
+
       setFormData((prev) => ({
         ...prev,
         location: {
-          houseNo: "",
-          street: "",
-          city: "",
-          district: "",
-          state: "",
-          country: "",
-          pincode: "",
-          latitude: "",
-          longitude: "",
+          ...prev.location,
+          ...updatedLocation,
         },
       }));
+    } catch (err) {
+      console.error("Reverse geocoding failed:", err);
     }
-  }, []);
+  }, [setFormData]);
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation not supported.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setMarker({ lat, lng });
+        setMarkerPlaced(true);
+        reverseGeocode(lat, lng);
+        if (mapRef) mapRef.panTo({ lat, lng });
+      },
+      () => setError("Location access denied.")
+    );
+  };
+
+  const handlePlaceChange = () => {
+    const autocomplete = autocompleteRef.current;
+    if (!autocomplete) return;
+
+    const place = autocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) return;
+
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+
+    setMarker({ lat, lng });
+    setMarkerPlaced(true);
+    reverseGeocode(lat, lng);
+    if (mapRef) mapRef.panTo({ lat, lng });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       location: {
@@ -33,127 +117,106 @@ const LocationSection = ({ formData, setFormData, onNext, onBack }) => {
     }));
   };
 
-  const detectLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
-          );
-          const data = await res.json();
-          const address = data.address;
-
-          setFormData((prev) => ({
-            ...prev,
-            location: {
-              ...prev.location,
-              latitude,
-              longitude,
-              street: address.road || "",
-              city: address.city || address.town || "",
-              district: address.county || "",
-              state: address.state || "",
-              country: address.country || "",
-              pincode: address.postcode || "",
-            },
-          }));
-        } catch (err) {
-          console.error("Reverse geocoding failed:", err);
-          alert("Failed to fetch address from coordinates.");
-        }
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-        alert("Location detection failed.");
-      }
-    );
-  };
+  if (!isLoaded) return <p>Loading map...</p>;
 
   return (
     <div className="section-container">
       <h2>Edit Location Details</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <button type="button" onClick={detectLocation}>📍 Detect Location</button>
+      <button type="button" onClick={handleUseMyLocation}>📍 Detect Location</button>
 
-      <label>
-        House Number:
+      <Autocomplete
+        onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+        onPlaceChanged={handlePlaceChange}
+      >
         <input
           type="text"
-          name="houseNo"
-          value={formData.location?.houseNo || ""}
-          onChange={handleChange}
+          placeholder="Search location (city, street, etc.)"
+          style={{
+            width: "100%",
+            padding: "0.5rem",
+            margin: "1rem 0",
+            fontSize: "1rem",
+          }}
         />
-      </label>
+      </Autocomplete>
 
-      <label>
-        Street:
-        <input
-          type="text"
-          name="street"
-          value={formData.location?.street || ""}
-          onChange={handleChange}
-        />
-      </label>
+      <p style={{ color: "#333", fontSize: "14px", marginBottom: "0.5rem" }}>
+        📌 Please drag the red location icon to your correct location.
+      </p>
 
-      <label>
-        City:
-        <input
-          type="text"
-          name="city"
-          value={formData.location?.city || ""}
-          onChange={handleChange}
-        />
-      </label>
+      <div style={{ margin: "1rem 0" }}>
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          zoom={markerPlaced ? 18 : 10}
+          center={marker}
+          onLoad={(map) => setMapRef(map)}
+          onClick={(e) => {
+            const lat = e.latLng.lat();
+            const lng = e.latLng.lng();
+            setMarker({ lat, lng });
+            setMarkerPlaced(true);
+            reverseGeocode(lat, lng);
+            if (mapRef) mapRef.panTo({ lat, lng });
+          }}
+        >
+          <Marker
+            position={marker}
+            draggable
+            onDragEnd={(e) => {
+              const lat = e.latLng.lat();
+              const lng = e.latLng.lng();
+              setMarker({ lat, lng });
+              setMarkerPlaced(true);
+              reverseGeocode(lat, lng);
+              if (mapRef) mapRef.panTo({ lat, lng });
+            }}
+          />
+        </GoogleMap>
+      </div>
 
-      <label>
-        District:
-        <input
-          type="text"
-          name="district"
-          value={formData.location?.district || ""}
-          onChange={handleChange}
-        />
-      </label>
+      {!markerPlaced && (
+        <p style={{ color: "red", fontWeight: "bold" }}>
+          ⚠️ Please place the red marker on your house location to continue.
+        </p>
+      )}
 
-      <label>
-        State:
-        <input
-          type="text"
-          name="state"
-          value={formData.location?.state || ""}
-          onChange={handleChange}
-        />
-      </label>
+      <label>House Number:</label>
+      <input name="houseNo" value={location.houseNo || ""} onChange={handleChange} />
 
-      <label>
-        Country:
-        <input
-          type="text"
-          name="country"
-          value={formData.location?.country || ""}
-          onChange={handleChange}
-        />
-      </label>
+      <label>Street:</label>
+      <input name="street" value={location.street || ""} onChange={handleChange} />
 
-      <label>
-        Pincode:
-        <input
-          type="text"
-          name="pincode"
-          value={formData.location?.pincode || ""}
-          onChange={handleChange}
-        />
-      </label>
+      <label>City:</label>
+      <input name="city" value={location.city || ""} onChange={handleChange} />
 
-      <div className="navigation-buttons">
-        <button type="button" onClick={onBack}>Back</button>
-        <button type="button" onClick={onNext}>Next</button>
+      <label>District:</label>
+      <input name="district" value={location.district || ""} onChange={handleChange} />
+
+      <label>State:</label>
+      <select name="state" value={location.state || ""} onChange={handleChange}>
+        <option value="">Select State</option>
+        {[
+          "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa",
+          "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala",
+          "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+          "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+          "Uttar Pradesh", "Uttarakhand", "West Bengal", "Delhi", "Jammu and Kashmir", "Ladakh"
+        ].map((state) => (
+          <option key={state} value={state}>{state}</option>
+        ))}
+      </select>
+
+      <label>Country:</label>
+      <input name="country" value={location.country || "India"} onChange={handleChange} />
+
+      <label>Pincode:</label>
+      <input name="pincode" value={location.pincode || ""} onChange={handleChange} />
+
+      <div className="navigation-buttons" style={{ marginTop: "1rem" }}>
+        <button onClick={onBack}>Back</button>
+        <button onClick={onNext} disabled={!markerPlaced}>Next</button>
       </div>
     </div>
   );

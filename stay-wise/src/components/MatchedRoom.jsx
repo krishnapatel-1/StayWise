@@ -21,6 +21,10 @@ function Matched() {
     return front?.base64 || null;
   };
 
+  const handleViewClick = (propertyId) => {
+    navigate(`/customer/view/${propertyId}`);
+  };
+
   const handleNavbarSuggestionClick = (location) => {
       setNavbarSearch(location);
       setNavbarSuggestions([]);
@@ -87,7 +91,6 @@ function Matched() {
   const matchedLoc = properties.filter(
     room => room.location?.city?.toLowerCase().includes(req.location?.toLowerCase())
   );
-  localStorage.setItem('matched', JSON.stringify(matchedLoc));
 
   const gotoprof = () => navigate('/profile');
   const handleHome = () => navigate('/home');
@@ -171,7 +174,7 @@ function Matched() {
                   <p><strong>Type:</strong> {room.propertyType}</p>
                   <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
 
-                  <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
+                  <button onClick={() => handleViewClick(room._id)}>View</button>
                 </div>
               )))}
             </div>

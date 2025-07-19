@@ -18,6 +18,7 @@ import ViewProperty from "./components/ViewProperty";
 import ThemeToggle from './components/ThemeToggle';
 import SearchRooms from './components/SearchRoom';
 import EditProperty from './components/EditProperty';
+import ViewPropertyCustomer from './components/viewPropertyCustomer';
 // import Landing from './components/Landing';
 import './App.css';
 
@@ -63,6 +64,7 @@ function AppContent() {
         <Route path="*" element={<LandingPage />} />
         <Route path='/search' element={<SearchRooms/>} />
         <Route path="/edit-property/:propertyId" element={<EditProperty />} />
+        <Route path="/customer/view/:propertyId" element={<ViewPropertyCustomer />} />
       </Routes>
     </>
   );
