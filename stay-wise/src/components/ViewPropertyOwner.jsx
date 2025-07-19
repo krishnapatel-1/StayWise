@@ -1,13 +1,16 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ViewPropertyOwner.css";
-import PropertyMapPreview from "./PropertyMapPreview";
 import {
   GoogleMap,
   Marker,
   DirectionsRenderer,
   useLoadScript,
+  Autocomplete,
+  OverlayView,
 } from "@react-google-maps/api";
+
+const libraries = ["places"];
 
 function ViewProperty() {
   const { propertyId } = useParams();
@@ -16,9 +19,12 @@ function ViewProperty() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [directions, setDirections] = useState(null);
-  const [userLocation, setUserLocation] = useState(null); // Origin
+  const [userLocation, setUserLocation] = useState(null);
   const [destination, setDestination] = useState(null);
+  const [autocomplete, setAutocomplete] = useState(null);
+  const [distanceData, setDistanceData] = useState(null);
 
+  const autocompleteRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user"));
   const isCustomer = user?.role === "customer";
   const isOwner = user?.role === "owner";
@@ -26,12 +32,12 @@ function ViewProperty() {
 
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
   });
 
   const calculateRoute = useCallback(
     (origin) => {
       if (!destination || !isLoaded) return;
-
       const directionsService = new window.google.maps.DirectionsService();
       directionsService.route(
         {
@@ -43,6 +49,15 @@ function ViewProperty() {
           if (status === "OK") {
             setDirections(result);
             setUserLocation(origin);
+
+            const leg = result.routes[0]?.legs[0];
+            if (leg) {
+              setDistanceData({
+                text: leg.distance.text,
+                value: leg.distance.value,
+                duration: leg.duration.text,
+              });
+            }
           } else {
             console.error("Directions request failed:", status);
           }
@@ -64,10 +79,7 @@ function ViewProperty() {
           lng: parseFloat(data.location.longitude),
         };
         setDestination(dest);
-
-        if (storedCoords) {
-          calculateRoute(storedCoords);
-        }
+        if (storedCoords) calculateRoute(storedCoords);
       }
     } catch (err) {
       console.error("Error fetching property:", err);
@@ -96,22 +108,11 @@ function ViewProperty() {
   if (loading) return <div className="property-container">Loading...</div>;
   if (!property) return <div className="property-container">Property not found.</div>;
 
-  const {
-    propertyType,
-    totalArea,
-    toLet,
-    location = {},
-    furnishing,
-    floorNumber,
-    balcony,
-    balconyCount,
-    facing,
-  } = property;
+  const { propertyType, totalArea, toLet, location = {}, furnishing, floorNumber, balcony, balconyCount, facing } = property;
 
   return (
     <div className="property-container">
       <h2>Property Details</h2>
-
       <p><strong>Type:</strong> {propertyType}</p>
       <p><strong>Furnishing:</strong> {furnishing}</p>
       <p><strong>Total Area:</strong> {totalArea}</p>
@@ -123,15 +124,11 @@ function ViewProperty() {
       {isOwner && (
         <>
           <button onClick={toggleToLet}>Toggle To‑Let</button>
-          <button
-            onClick={() => navigate("/my-property")}
-            style={{ backgroundColor: "#dc3545", marginLeft: "10px" }}
-          >
+          <button onClick={() => navigate("/my-property")} style={{ backgroundColor: "#dc3545", marginLeft: "10px" }}>
             Close
           </button>
         </>
       )}
-
       <button onClick={() => navigate(`/edit-property/${property._id}`)} style={{ marginLeft: "10px" }}>
         Edit Details
       </button>
@@ -143,46 +140,30 @@ function ViewProperty() {
       <p><strong>State:</strong> {location.state}</p>
       <p><strong>Country:</strong> {location.country}</p>
 
-
-      {/* <h3>Map Preview</h3>
-      <PropertyMapPreview
-        lat={parseFloat(location.latitude)}
-        lng={parseFloat(location.longitude)}
-      /> */}
-
-      {/* Static Map Preview for Owners */}
-      {isOwner && isLoaded && location.latitude && location.longitude && (
-        <div className="map-wrapper">
-          <h3>📌 Property Location Preview</h3>
-          <GoogleMap
-            mapContainerStyle={{ width: "100%", height: "400px" }}
-            center={{
-              lat: parseFloat(location.latitude),
-              lng: parseFloat(location.longitude),
-            }}
-            zoom={15}
-          >
-            <Marker
-              position={{
-                lat: parseFloat(location.latitude),
-                lng: parseFloat(location.longitude),
-              }}
-            />
-          </GoogleMap>
-        </div>
-      )}
-
-      {/* 👉this is the second map preview for customer */}
-
-      {/* Route Map with Draggable Origin for Customers */}
       {isCustomer && isLoaded && destination && (
         <div className="map-wrapper">
           <h3>📍 Route from your location to property:</h3>
-          <p style={{ fontSize: "0.9rem", marginBottom: "8px" }}>
-            Drag the red marker to adjust your starting point.
-          </p>
+          <Autocomplete
+            onLoad={(ref) => setAutocomplete(ref)}
+            onPlaceChanged={() => {
+              const place = autocomplete?.getPlace();
+              if (place?.geometry?.location) {
+                const newOrigin = {
+                  lat: place.geometry.location.lat(),
+                  lng: place.geometry.location.lng(),
+                };
+                calculateRoute(newOrigin);
+              }
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search starting location"
+              ref={autocompleteRef}
+              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            />
+          </Autocomplete>
 
-          {/* 👉 NEW: Use My Location Button */}
           <button
             onClick={() => {
               navigator.geolocation.getCurrentPosition(
@@ -199,18 +180,22 @@ function ViewProperty() {
                 }
               );
             }}
-            style={{
-              marginBottom: "10px",
-              padding: "6px 12px",
-              borderRadius: "4px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
+            style={{ marginBottom: "10px", padding: "6px 12px", borderRadius: "4px", backgroundColor: "#007bff", color: "white", border: "none", cursor: "pointer" }}
           >
             📍 Use My Current Location
           </button>
+
+          {distanceData && (
+            <div style={{
+              marginBottom: "10px",
+              padding: "6px 12px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "6px",
+              display: "inline-block"
+            }}>
+              📏 Distance: <b>{distanceData.text}</b> | 🕒 Time: <b>{distanceData.duration}</b>
+            </div>
+          )}
 
           <div className="map-container">
             <GoogleMap
@@ -226,39 +211,50 @@ function ViewProperty() {
               }}
             >
               {userLocation && (
-                <Marker
-                  position={userLocation}
-                  draggable
-                  icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
-                  onDragEnd={(e) => {
-                    const newOrigin = {
-                      lat: e.latLng.lat(),
-                      lng: e.latLng.lng(),
-                    };
-                    calculateRoute(newOrigin);
-                  }}
-                />
+                <>
+                  <Marker
+                    position={userLocation}
+                    draggable
+                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+                    onDragEnd={(e) => {
+                      const newOrigin = {
+                        lat: e.latLng.lat(),
+                        lng: e.latLng.lng(),
+                      };
+                      calculateRoute(newOrigin);
+                    }}
+                  />
+                  <OverlayView position={userLocation} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                    <div className="custom-label"><b>You</b></div>
+                  </OverlayView>
+                </>
               )}
+
               <Marker
                 position={destination}
                 icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+                label={{
+                  text: "HOUSE",
+                  color: "#000",
+                  fontSize: "14px",
+                  fontWeight: "bold"
+                }}
               />
+              <OverlayView position={destination} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                <div className="custom-label"><b>Property</b><div className="subtext">Listed by Owner</div></div>
+              </OverlayView>
+
               {directions && <DirectionsRenderer directions={directions} />}
             </GoogleMap>
           </div>
         </div>
       )}
 
-
       {isCustomer && !storedCoords && (
-        <p style={{ color: "red" }}>
-          📍 Please allow location access on the home page to view directions.
-        </p>
+        <p style={{ color: "red" }}>📍 Please allow location access on the home page to view directions.</p>
       )}
     </div>
   );
 }
-
-
 
 export default ViewProperty;
