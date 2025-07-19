@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api";
 
 const ViewPropertyCustomer = () => {
   const { propertyId } = useParams();
@@ -59,13 +58,6 @@ const ViewPropertyCustomer = () => {
 
   const type = propertyType.toLowerCase();
 
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
-
-  const lat = parseFloat(location?.latitude);
-  const lng = parseFloat(location?.longitude);
-
   return (
     <div className="section-container">
       <h2>Property Details</h2>
@@ -121,19 +113,6 @@ const ViewPropertyCustomer = () => {
       <p><strong>State:</strong> {location.state || "Unavailable"}</p>
       <p><strong>Country:</strong> {location.country || "Unavailable"}</p>
       <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
-
-      {isLoaded && !isNaN(lat) && !isNaN(lng) && (
-        <div style={{ height: "400px", marginTop: "20px" }}>
-          <h3>📍 Property Location</h3>
-          <GoogleMap
-            mapContainerStyle={{ width: "100%", height: "100%" }}
-            center={{ lat, lng }}
-            zoom={15}
-          >
-            <Marker position={{ lat, lng }} />
-          </GoogleMap>
-        </div>
-      )}
 
       {houseFloorDetails.length > 0 && type === "house" && (
         <div>
