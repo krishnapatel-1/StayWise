@@ -16,7 +16,7 @@ function ViewProperty() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [directions, setDirections] = useState(null);
-  const [userLocation, setUserLocation] = useState(null); // Origin
+  const [userLocation, setUserLocation] = useState(null); // Origin \\
   const [destination, setDestination] = useState(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
