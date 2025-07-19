@@ -4,7 +4,7 @@ const PhotoSchema = new mongoose.Schema({
   label: String,
   name: String,
   type: String,
-  base64: String, // ✅ added
+  base64: String,
 });
 
 

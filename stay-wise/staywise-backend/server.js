@@ -24,7 +24,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("✅ API is running...");
+  res.send("API is running...");
 });
 
 // OTP route
@@ -36,7 +36,7 @@ mongoose.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 })
 .then(() => {
-  console.log("✅ MongoDB connected");
+  console.log("MongoDB connected");
 
   // Routes
   app.use("/api/users", userRoutes);
