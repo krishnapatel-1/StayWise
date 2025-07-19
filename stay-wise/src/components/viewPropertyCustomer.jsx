@@ -1,9 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  GoogleMap,
+  Marker,
+  DirectionsRenderer,
+  useLoadScript,
+  Autocomplete,
+  OverlayView
+} from "@react-google-maps/api";
+import { useCallback, useRef } from "react";
+
+const libraries = ["places"];
 
 const ViewPropertyCustomer = () => {
   const { propertyId } = useParams();
   const [property, setProperty] = useState(null);
+  const storedCoords = JSON.parse(localStorage.getItem("userLocation"));
+
+  const [directions, setDirections] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [distanceData, setDistanceData] = useState(null);
+  const [autocomplete, setAutocomplete] = useState(null);
+
+  const autocompleteRef = useRef(null);
+  const mapRef = useRef(null); // ✅ Add this here
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  // const isCustomer = user?.role === "customer";
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
+
+  const onMapLoad = useCallback((map) => {
+    mapRef.current = map;
+  }, []);
 
   useEffect(() => {
     const fetchProperty = async () => {
@@ -12,6 +45,20 @@ const ViewPropertyCustomer = () => {
         const data = await res.json();
         if (res.ok) {
           setProperty(data);
+
+          // Set destination location exists
+          if (
+            data.location?.latitude &&
+            data.location?.longitude
+          ) {
+            const dest = {
+              lat: parseFloat(data.location.latitude),
+              lng: parseFloat(data.location.longitude),
+            };
+            setDestination(dest);
+
+            if (storedCoords) calculateRoute(storedCoords, dest);
+          }
         } else {
           console.error("❌ Failed to fetch:", data.message);
         }
@@ -20,10 +67,41 @@ const ViewPropertyCustomer = () => {
       }
     };
 
-    fetchProperty();
-  }, [propertyId]);
+    if (propertyId && isLoaded) fetchProperty();
+  }, [propertyId, isLoaded]);
 
-  if (!property) return <div>Loading...</div>;
+  const calculateRoute = useCallback((origin, destinationOverride = destination) => {
+    if (!destinationOverride || !isLoaded) return;
+    const directionsService = new window.google.maps.DirectionsService();
+    directionsService.route(
+      {
+        origin,
+        destination: destinationOverride,
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === "OK") {
+          setDirections(result);
+          setUserLocation(origin);
+
+          const leg = result.routes[0]?.legs[0];
+          if (leg) {
+            setDistanceData({
+              text: leg.distance.text,
+              value: leg.distance.value,
+              duration: leg.duration.text,
+            });
+          }
+        } else {
+          console.error("Directions request failed:", status);
+        }
+      }
+    );
+  }, [destination, isLoaded]);
+
+
+  if (!property) return <div>Loading property details...</div>;
+  if (!isLoaded) return <div>Loading map...</div>;
 
   const {
     propertyType = "Unavailable",
@@ -113,6 +191,169 @@ const ViewPropertyCustomer = () => {
       <p><strong>State:</strong> {location.state || "Unavailable"}</p>
       <p><strong>Country:</strong> {location.country || "Unavailable"}</p>
       <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
+
+      <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
+
+      {isLoaded && destination && (
+        <div className="map-wrapper">
+          <h3>📍 Route from your location to property:</h3>
+
+          <Autocomplete
+            onLoad={(ref) => setAutocomplete(ref)}
+            onPlaceChanged={() => {
+              const place = autocomplete.getPlace();
+              if (place?.geometry?.location) {
+                const newOrigin = {
+                  lat: place.geometry.location.lat(),
+                  lng: place.geometry.location.lng(),
+                };
+                calculateRoute(newOrigin);
+              }
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search starting location"
+              ref={autocompleteRef}
+              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            />
+          </Autocomplete>
+
+          <button
+            onClick={() => {
+              navigator.geolocation.getCurrentPosition(
+                (position) => {
+                  const currentLoc = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                  };
+                  calculateRoute(currentLoc);
+                },
+                (error) => {
+                  alert("Unable to access location. Please allow location access.");
+                  console.error(error);
+                }
+              );
+            }}
+            style={{
+              marginBottom: "10px",
+              padding: "6px 12px",
+              borderRadius: "4px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            📍 Use My Current Location
+          </button>
+
+          {distanceData && (
+            <div style={{
+              marginBottom: "10px",
+              padding: "6px 12px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "6px",
+              display: "inline-block"
+            }}>
+              📏 Distance: <b>{distanceData.text}</b> | 🕒 Time: <b>{distanceData.duration}</b>
+            </div>
+          )}
+
+          <div className="map-container">
+            <GoogleMap
+              mapContainerClassName="map-inner"
+              zoom={14}
+              center={userLocation || destination}
+              onClick={(e) => {
+                const newOrigin = {
+                  lat: e.latLng.lat(),
+                  lng: e.latLng.lng(),
+                };
+                calculateRoute(newOrigin);
+              }}
+            >
+              {userLocation && (
+                <Marker
+                  position={userLocation}
+                  draggable
+                  icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+                  onDragEnd={(e) => {
+                    const newOrigin = {
+                      lat: e.latLng.lat(),
+                      lng: e.latLng.lng(),
+                    };
+                    calculateRoute(newOrigin);
+                  }}
+                />
+              )}
+
+              <Marker
+                position={destination}
+                icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+              />
+
+              {directions && (
+                <DirectionsRenderer
+                  directions={directions}
+                  options={{ suppressMarkers: true }}
+                />
+              )}
+
+              {userLocation && (
+                <>
+                  <Marker
+                    position={userLocation}
+                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+                    draggable
+                    onDragEnd={(e) => {
+                      const newOrigin = {
+                        lat: e.latLng.lat(),
+                        lng: e.latLng.lng(),
+                      };
+                      calculateRoute(newOrigin);
+                    }}
+                  />
+                  <OverlayView position={userLocation} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                    <div className="custom-label"><b>You</b></div>
+                  </OverlayView>
+                </>
+              )}
+
+              {destination && (
+                <>
+                  <Marker
+                    position={destination}
+                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+                  />
+                  <OverlayView position={destination} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                    <div className="custom-label">
+                      <b>Destination</b>
+                    </div>
+                  </OverlayView>
+                </>
+              )}
+
+            </GoogleMap>
+          </div>
+        </div>
+      )}
+
+      <div style={{ marginTop: "10px", display: "flex", gap: "20px", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px", justifyContent: "center" }}>
+          <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Red Pin" style={{ width: "15px", height: "15px" }} />
+          <span>You</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Blue Pin" style={{ width: "15px", height: "15px" }} />
+          <span>Destination</span>
+        </div>
+      </div>
+
+      {!storedCoords && (
+        <p style={{ color: "red" }}>📍 Please allow location access on the home page to view directions.</p>
+      )}
+
 
       {houseFloorDetails.length > 0 && type === "house" && (
         <div>

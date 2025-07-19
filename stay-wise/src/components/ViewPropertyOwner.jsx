@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import "./ViewProperty.css";
-import PropertyMapPreview from "../components/PropertyMapPreview";
+import "./ViewPropertyOwner.css";
+import PropertyMapPreview from "./PropertyMapPreview";
 import {
   GoogleMap,
   Marker,

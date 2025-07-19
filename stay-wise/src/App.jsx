@@ -14,7 +14,7 @@ import Selected from './components/SelectedRoom';
 import AddYourProperty from './components/AddYourProperty';
 import OwnProfile from './components/OwnerProfile';
 import Property from './components/myProperty';
-import ViewProperty from "./components/ViewProperty";
+import ViewProperty from "./components/ViewPropertyOwner";
 import ThemeToggle from './components/ThemeToggle';
 import SearchRooms from './components/SearchRoom';
 import EditProperty from './components/EditProperty';
