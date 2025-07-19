@@ -1,0 +1,84 @@
+/* Dark background */
+.booking-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #0f172a;
+    /* dark slate */
+    padding: 1rem;
+}
+
+/* Card Styling */
+.booking-card {
+    background-color: #1e293b;
+    /* darker card */
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    padding: 2.5rem;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Icon circle */
+.icon-wrapper {
+    margin-bottom: 2rem;
+}
+
+.checkmark-circle {
+    width: 70px;
+    height: 70px;
+    background-color: #10b98133;
+    /* semi-transparent green */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.checkmark-icon {
+    width: 36px;
+    height: 36px;
+    color: #22c55e;
+    /* bright green */
+}
+
+/* Text styles */
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    /* light gray */
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    margin-bottom: 0.75rem;
+}
+
+.message {
+    font-size: 1rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+}
+
+/* Button styling */
+.home-button {
+    display: inline-block;
+    background-color: #3b82f6;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.85rem 1.75rem;
+    border-radius: 0.625rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.home-button:hover {
+    background-color: #2563eb;
+}

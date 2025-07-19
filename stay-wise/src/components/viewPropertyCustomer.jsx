@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   GoogleMap,
   Marker,
@@ -13,6 +14,7 @@ import { useCallback, useRef } from "react";
 const libraries = ["places"];
 
 const ViewPropertyCustomer = () => {
+  const navigate = useNavigate();
   const { propertyId } = useParams();
   const [property, setProperty] = useState(null);
   const storedCoords = JSON.parse(localStorage.getItem("userLocation"));
@@ -22,6 +24,7 @@ const ViewPropertyCustomer = () => {
   const [destination, setDestination] = useState(null);
   const [distanceData, setDistanceData] = useState(null);
   const [autocomplete, setAutocomplete] = useState(null);
+  const [isBooking, setIsBooking] = useState(false);
 
   const autocompleteRef = useRef(null);
   const mapRef = useRef(null); // ✅ Add this here
@@ -135,177 +138,231 @@ const ViewPropertyCustomer = () => {
   } = property;
 
   const type = propertyType.toLowerCase();
+  const handleBook = async () => {
+    // 1. Check if the property is available
+    if (toLet === "No" || toLet === false) {
+      alert("🚫 This property is not available for booking.");
+      return;
+    }
+
+    // 2. Check if a user is logged in
+    const customer = JSON.parse(localStorage.getItem("user"));
+    if (!customer || !customer._id) {
+      alert("⚠️ Please log in to book a property.");
+      navigate('/login'); // Optional: redirect to login
+      return;
+    }
+
+    // 3. Set loading state to prevent multiple clicks
+    setIsBooking(true);
+
+    try {
+      const bookingData = {
+        // Using property.owner to match your latest schema
+        ownerId: property.ownerId,
+        customerId: customer._id,
+        propertyId: propertyId,
+      };
+
+      // 4. First API Call: Create a booking for the owner
+      const resOwner = await fetch('http://localhost:4000/api/bookings/owner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!resOwner.ok) {
+        const errorData = await resOwner.json();
+        throw new Error(errorData.message || 'Failed to create owner booking.');
+      }
+
+      // 5. Second API Call: Create a booking for the customer
+      const resCustomer = await fetch('http://localhost:4000/api/bookings/customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bookingData),
+      });
+
+      if (!resCustomer.ok) {
+        const errorData = await resCustomer.json();
+        // Here you might want to add logic to reverse the owner booking if this one fails
+        throw new Error(errorData.message || 'Failed to create customer booking.');
+      }
+
+      // ✅ 6. Third API Call to update the property status to "No"
+      try {
+        const resUpdateStatus = await fetch(`http://localhost:4000/api/properties/${propertyId}/status`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ toLet: "No" }), // Explicitly set status to "No"
+        });
+
+        if (!resUpdateStatus.ok) {
+          // If this fails, we just log a warning because the booking itself was successful
+          console.warn("Booking was successful, but failed to update property status.");
+        }
+      } catch (updateError) {
+        console.warn("An error occurred while updating property status:", updateError);
+      }
+
+
+      // 7. On success
+      alert('✅ Booking successful! The property has been marked as unavailable.');
+      navigate('/booking_page'); // Navigate to a confirmation or dashboard page
+
+    } catch (error) {
+      console.error("❌ Booking failed:", error);
+      alert(`Booking failed: ${error.message}`);
+    } finally {
+      // 8. Reset loading state
+      setIsBooking(false);
+    }
+  };
+
 
   return (
-    <div className="section-container">
-      <h2>Property Details</h2>
-      <p><strong>Type:</strong> {propertyType}</p>
-      <p><strong>Furnishing:</strong> {furnishing}</p>
-      <p><strong>Total Area:</strong> {totalArea}</p>
-      <p><strong>Floor Number:</strong> {floorNumber}</p>
-      <p><strong>Balcony:</strong> {balcony} {balcony === "Yes" ? `(${balconyCount})` : ""}</p>
-      <p><strong>Facing:</strong> {facing}</p>
-      <p><strong>Status:</strong> {toLet}</p>
+    <>
+      <div className="section-container">
+        <h2>Property Details</h2>
+        <p><strong>Type:</strong> {propertyType}</p>
+        <p><strong>Furnishing:</strong> {furnishing}</p>
+        <p><strong>Total Area:</strong> {totalArea}</p>
+        <p><strong>Floor Number:</strong> {floorNumber}</p>
+        <p><strong>Balcony:</strong> {balcony} {balcony === "Yes" ? `(${balconyCount})` : ""}</p>
+        <p><strong>Facing:</strong> {facing}</p>
+        <p><strong>Status:</strong> {toLet}</p>
 
-      <h3>Utilities</h3>
-      <p><strong>Electricity:</strong> {electricity}</p>
-      <p><strong>Water Supply:</strong> {waterSupply}</p>
-      <p><strong>Wi-Fi:</strong> {wifi ? "Yes" : "No"}</p>
-      <p><strong>AC:</strong> {ac ? "Yes" : "No"}</p>
-      <p><strong>Fans:</strong> {fans ? "Yes" : "No"}</p>
-      <p><strong>Geyser:</strong> {geyser ? "Yes" : "No"}</p>
-      <p><strong>Refrigerator:</strong> {refrigerator ? "Yes" : "No"}</p>
-      <p><strong>Washing Machine:</strong> {washingMachine ? "Yes" : "No"}</p>
-      <p><strong>Power Backup:</strong> {powerBackup ? "Yes" : "No"}</p>
+        <h3>Utilities</h3>
+        <p><strong>Electricity:</strong> {electricity}</p>
+        <p><strong>Water Supply:</strong> {waterSupply}</p>
+        <p><strong>Wi-Fi:</strong> {wifi ? "Yes" : "No"}</p>
+        <p><strong>AC:</strong> {ac ? "Yes" : "No"}</p>
+        <p><strong>Fans:</strong> {fans ? "Yes" : "No"}</p>
+        <p><strong>Geyser:</strong> {geyser ? "Yes" : "No"}</p>
+        <p><strong>Refrigerator:</strong> {refrigerator ? "Yes" : "No"}</p>
+        <p><strong>Washing Machine:</strong> {washingMachine ? "Yes" : "No"}</p>
+        <p><strong>Power Backup:</strong> {powerBackup ? "Yes" : "No"}</p>
 
-      <h3>Facilities</h3>
-      <p><strong>Parking:</strong> {facilities.parking || "Unavailable"}</p>
-      <p><strong>CCTV:</strong> {facilities.cctv ? "Yes" : "No"}</p>
-      <p><strong>Guard:</strong> {facilities.guard ? "Yes" : "No"}</p>
-      <p><strong>Lift:</strong> {facilities.lift ? "Yes" : "No"}</p>
+        <h3>Facilities</h3>
+        <p><strong>Parking:</strong> {facilities.parking || "Unavailable"}</p>
+        <p><strong>CCTV:</strong> {facilities.cctv ? "Yes" : "No"}</p>
+        <p><strong>Guard:</strong> {facilities.guard ? "Yes" : "No"}</p>
+        <p><strong>Lift:</strong> {facilities.lift ? "Yes" : "No"}</p>
 
-      {(type === "pg room" || type === "hostel room") && (
-        <>
-          <h3>Services</h3>
-          <p><strong>Meals Included:</strong> {services.mealsIncluded || "Unavailable"}</p>
-          <p><strong>Gate Open:</strong> {services.gateOpen || "Unavailable"}</p>
-          <p><strong>Gate Close:</strong> {services.gateClose || "Unavailable"}</p>
-          <p><strong>Housekeeping:</strong> {services.housekeeping || "Unavailable"}</p>
-          <p><strong>Laundry:</strong> {services.laundry ? "Yes" : "Unavailable"}</p>
-        </>
-      )}
+        {(type === "pg room" || type === "hostel room") && (
+          <>
+            <h3>Services</h3>
+            <p><strong>Meals Included:</strong> {services.mealsIncluded || "Unavailable"}</p>
+            <p><strong>Gate Open:</strong> {services.gateOpen || "Unavailable"}</p>
+            <p><strong>Gate Close:</strong> {services.gateClose || "Unavailable"}</p>
+            <p><strong>Housekeeping:</strong> {services.housekeeping || "Unavailable"}</p>
+            <p><strong>Laundry:</strong> {services.laundry ? "Yes" : "Unavailable"}</p>
+          </>
+        )}
 
-      <h3>Pricing</h3>
-      <p><strong>Daily Rent:</strong> ₹{dailyRent}</p>
-      <p><strong>Monthly Rent:</strong> ₹{monthlyRent}</p>
-      <p><strong>Security Deposit:</strong> ₹{securityDeposit}</p>
-      <p><strong>Maintenance Charges:</strong> ₹{maintenanceCharges}</p>
-      <p><strong>Negotiable:</strong> {negotiable ? "Yes" : "No"}</p>
-      <p><strong>Note:</strong> {pricingNote || "None"}</p>
+        <h3>Pricing</h3>
+        <p><strong>Daily Rent:</strong> ₹{dailyRent}</p>
+        <p><strong>Monthly Rent:</strong> ₹{monthlyRent}</p>
+        <p><strong>Security Deposit:</strong> ₹{securityDeposit}</p>
+        <p><strong>Maintenance Charges:</strong> ₹{maintenanceCharges}</p>
+        <p><strong>Negotiable:</strong> {negotiable ? "Yes" : "No"}</p>
+        <p><strong>Note:</strong> {pricingNote || "None"}</p>
 
-      <h3>Location</h3>
-      <p><strong>House No:</strong> {location.houseNo || "Unavailable"}</p>
-      <p><strong>Street:</strong> {location.street || "Unavailable"}</p>
-      <p><strong>City:</strong> {location.city || "Unavailable"}</p>
-      <p><strong>District:</strong> {location.district || "Unavailable"}</p>
-      <p><strong>State:</strong> {location.state || "Unavailable"}</p>
-      <p><strong>Country:</strong> {location.country || "Unavailable"}</p>
-      <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
+        <h3>Location</h3>
+        <p><strong>House No:</strong> {location.houseNo || "Unavailable"}</p>
+        <p><strong>Street:</strong> {location.street || "Unavailable"}</p>
+        <p><strong>City:</strong> {location.city || "Unavailable"}</p>
+        <p><strong>District:</strong> {location.district || "Unavailable"}</p>
+        <p><strong>State:</strong> {location.state || "Unavailable"}</p>
+        <p><strong>Country:</strong> {location.country || "Unavailable"}</p>
+        <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
 
-      <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
+        <p><strong>Pincode:</strong> {location.pincode || "Unavailable"}</p>
 
-      {isLoaded && destination && (
-        <div className="map-wrapper">
-          <h3>📍 Route from your location to property:</h3>
+        {isLoaded && destination && (
+          <div className="map-wrapper">
+            <h3>📍 Route from your location to property:</h3>
 
-          <Autocomplete
-            onLoad={(ref) => setAutocomplete(ref)}
-            onPlaceChanged={() => {
-              const place = autocomplete.getPlace();
-              if (place?.geometry?.location) {
-                const newOrigin = {
-                  lat: place.geometry.location.lat(),
-                  lng: place.geometry.location.lng(),
-                };
-                calculateRoute(newOrigin);
-              }
-            }}
-          >
-            <input
-              type="text"
-              placeholder="Search starting location"
-              ref={autocompleteRef}
-              style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-            />
-          </Autocomplete>
-
-          <button
-            onClick={() => {
-              navigator.geolocation.getCurrentPosition(
-                (position) => {
-                  const currentLoc = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
+            <Autocomplete
+              onLoad={(ref) => setAutocomplete(ref)}
+              onPlaceChanged={() => {
+                const place = autocomplete.getPlace();
+                if (place?.geometry?.location) {
+                  const newOrigin = {
+                    lat: place.geometry.location.lat(),
+                    lng: place.geometry.location.lng(),
                   };
-                  calculateRoute(currentLoc);
-                },
-                (error) => {
-                  alert("Unable to access location. Please allow location access.");
-                  console.error(error);
+                  calculateRoute(newOrigin);
                 }
-              );
-            }}
-            style={{
-              marginBottom: "10px",
-              padding: "6px 12px",
-              borderRadius: "4px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            📍 Use My Current Location
-          </button>
-
-          {distanceData && (
-            <div style={{
-              marginBottom: "10px",
-              padding: "6px 12px",
-              backgroundColor: "#f0f0f0",
-              borderRadius: "6px",
-              display: "inline-block"
-            }}>
-              📏 Distance: <b>{distanceData.text}</b> | 🕒 Time: <b>{distanceData.duration}</b>
-            </div>
-          )}
-
-          <div className="map-container">
-            <GoogleMap
-              mapContainerClassName="map-inner"
-              zoom={14}
-              center={userLocation || destination}
-              onClick={(e) => {
-                const newOrigin = {
-                  lat: e.latLng.lat(),
-                  lng: e.latLng.lng(),
-                };
-                calculateRoute(newOrigin);
               }}
             >
-              {userLocation && (
-                <Marker
-                  position={userLocation}
-                  draggable
-                  icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
-                  onDragEnd={(e) => {
-                    const newOrigin = {
-                      lat: e.latLng.lat(),
-                      lng: e.latLng.lng(),
-                    };
-                    calculateRoute(newOrigin);
-                  }}
-                />
-              )}
-
-              <Marker
-                position={destination}
-                icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+              <input
+                type="text"
+                placeholder="Search starting location"
+                ref={autocompleteRef}
+                style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
               />
+            </Autocomplete>
 
-              {directions && (
-                <DirectionsRenderer
-                  directions={directions}
-                  options={{ suppressMarkers: true }}
-                />
-              )}
+            <button
+              onClick={() => {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    const currentLoc = {
+                      lat: position.coords.latitude,
+                      lng: position.coords.longitude,
+                    };
+                    calculateRoute(currentLoc);
+                  },
+                  (error) => {
+                    alert("Unable to access location. Please allow location access.");
+                    console.error(error);
+                  }
+                );
+              }}
+              style={{
+                marginBottom: "10px",
+                padding: "6px 12px",
+                borderRadius: "4px",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              📍 Use My Current Location
+            </button>
 
-              {userLocation && (
-                <>
+            {distanceData && (
+              <div style={{
+                marginBottom: "10px",
+                padding: "6px 12px",
+                backgroundColor: "#f0f0f0",
+                borderRadius: "6px",
+                display: "inline-block"
+              }}>
+                📏 Distance: <b>{distanceData.text}</b> | 🕒 Time: <b>{distanceData.duration}</b>
+              </div>
+            )}
+
+            <div className="map-container">
+              <GoogleMap
+                mapContainerClassName="map-inner"
+                zoom={14}
+                center={userLocation || destination}
+                onClick={(e) => {
+                  const newOrigin = {
+                    lat: e.latLng.lat(),
+                    lng: e.latLng.lng(),
+                  };
+                  calculateRoute(newOrigin);
+                }}
+              >
+                {userLocation && (
                   <Marker
                     position={userLocation}
-                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
                     draggable
+                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
                     onDragEnd={(e) => {
                       const newOrigin = {
                         lat: e.latLng.lat(),
@@ -314,82 +371,128 @@ const ViewPropertyCustomer = () => {
                       calculateRoute(newOrigin);
                     }}
                   />
-                  <OverlayView position={userLocation} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
-                    <div className="custom-label"><b>You</b></div>
-                  </OverlayView>
-                </>
-              )}
+                )}
 
-              {destination && (
-                <>
-                  <Marker
-                    position={destination}
-                    icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+                <Marker
+                  position={destination}
+                  icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+                />
+
+                {directions && (
+                  <DirectionsRenderer
+                    directions={directions}
+                    options={{ suppressMarkers: true }}
                   />
-                  <OverlayView position={destination} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
-                    <div className="custom-label">
-                      <b>Destination</b>
-                    </div>
-                  </OverlayView>
-                </>
-              )}
+                )}
 
-            </GoogleMap>
+                {userLocation && (
+                  <>
+                    <Marker
+                      position={userLocation}
+                      icon={{ url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png" }}
+                      draggable
+                      onDragEnd={(e) => {
+                        const newOrigin = {
+                          lat: e.latLng.lat(),
+                          lng: e.latLng.lng(),
+                        };
+                        calculateRoute(newOrigin);
+                      }}
+                    />
+                    <OverlayView position={userLocation} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                      <div className="custom-label"><b>You</b></div>
+                    </OverlayView>
+                  </>
+                )}
+
+                {destination && (
+                  <>
+                    <Marker
+                      position={destination}
+                      icon={{ url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" }}
+                    />
+                    <OverlayView position={destination} mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}>
+                      <div className="custom-label">
+                        <b>Destination</b>
+                      </div>
+                    </OverlayView>
+                  </>
+                )}
+
+              </GoogleMap>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: "10px", display: "flex", gap: "20px", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "5px", justifyContent: "center" }}>
+            <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Red Pin" style={{ width: "15px", height: "15px" }} />
+            <span>You</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Blue Pin" style={{ width: "15px", height: "15px" }} />
+            <span>Destination</span>
           </div>
         </div>
-      )}
 
-      <div style={{ marginTop: "10px", display: "flex", gap: "20px", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "5px", justifyContent: "center" }}>
-          <img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Red Pin" style={{ width: "15px", height: "15px" }} />
-          <span>You</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Blue Pin" style={{ width: "15px", height: "15px" }} />
-          <span>Destination</span>
-        </div>
-      </div>
-
-      {!storedCoords && (
-        <p style={{ color: "red" }}>📍 Please allow location access on the home page to view directions.</p>
-      )}
+        {!storedCoords && (
+          <p style={{ color: "red" }}>📍 Please allow location access on the home page to view directions.</p>
+        )}
 
 
-      {houseFloorDetails.length > 0 && type === "house" && (
-        <div>
-          <h3>House Floor Details</h3>
-          {houseFloorDetails.map((floor, i) => (
-            <div key={i}>
-              <strong>Floor {i + 1}:</strong>
-              <ul>
-                <li>Bedrooms: {floor.bedrooms || 0}</li>
-                <li>Bathrooms: {floor.bathrooms || 0}</li>
-                <li>Kitchens: {floor.kitchens || 0}</li>
-                <li>Halls: {floor.halls || 0}</li>
-                <li>Balconies: {floor.balconies || 0}</li>
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {photos.length > 0 && (
-        <>
-          <h3>Photos</h3>
-          <div className="photo-grid">
-            {photos.map((photo, idx) => (
-              <img
-                key={idx}
-                src={photo.base64}
-                alt={photo.label || `Image ${idx + 1}`}
-                style={{ width: "200px", height: "auto", margin: "10px" }}
-              />
+        {houseFloorDetails.length > 0 && type === "house" && (
+          <div>
+            <h3>House Floor Details</h3>
+            {houseFloorDetails.map((floor, i) => (
+              <div key={i}>
+                <strong>Floor {i + 1}:</strong>
+                <ul>
+                  <li>Bedrooms: {floor.bedrooms || 0}</li>
+                  <li>Bathrooms: {floor.bathrooms || 0}</li>
+                  <li>Kitchens: {floor.kitchens || 0}</li>
+                  <li>Halls: {floor.halls || 0}</li>
+                  <li>Balconies: {floor.balconies || 0}</li>
+                </ul>
+              </div>
             ))}
           </div>
-        </>
-      )}
-    </div>
+        )}
+
+        {photos.length > 0 && (
+          <>
+            <h3>Photos</h3>
+            <div className="photo-grid">
+              {photos.map((photo, idx) => (
+                <img
+                  key={idx}
+                  src={photo.base64}
+                  alt={photo.label || `Image ${idx + 1}`}
+                  style={{ width: "200px", height: "auto", margin: "10px" }}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <button
+          onClick={handleBook}
+          disabled={isBooking || toLet === "No" || toLet === false}
+          style={{
+            cursor: (isBooking || toLet === "No" || toLet === false) ? "not-allowed" : "pointer",
+            backgroundColor: (toLet === "No" || toLet === false) ? "#ccc" : "#007bff",
+            color: "white",
+            padding: "10px 20px",
+            border: "none",
+            borderRadius: "5px",
+            fontSize: "16px"
+          }}
+        >
+          {isBooking ? 'Booking...' : 'Book'}
+        </button>
+      </div>
+
+    </>
   );
+
 };
 
 export default ViewPropertyCustomer;
