@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 
+// Schema for storing photo information
 const PhotoSchema = new mongoose.Schema({
   label: String,
   name: String,
@@ -7,11 +8,13 @@ const PhotoSchema = new mongoose.Schema({
   base64: String,
 });
 
-
+// The main schema for property details
 const PropertyDetailSchema = new mongoose.Schema({
-  ownerId: {
-    type: String,
-    //required: true
+  // Changed ownerId to owner to maintain consistency with booking logic
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Reference to the User who owns the property
+    required: true
   },
   propertyType: String,
   furnishing: String,
@@ -87,14 +90,18 @@ const PropertyDetailSchema = new mongoose.Schema({
   pricingNote: String,
 
   // Photos
-  photos: [PhotoSchema], // ⬅️ Array of { label, fileId }
+  photos: [PhotoSchema],
 
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+}, {
+  timestamps: true, // Automatically add createdAt and updatedAt
+  // Explicitly tell Mongoose which collection to use
+  collection: 'propertydetails'
 });
 
-const PropertyDetail = mongoose.model("PropertyDetail", PropertyDetailSchema);
+// ✅ CRUCIAL FIX:
+// This line checks if the model has already been compiled. If it has, it
+// uses the existing model. If not, it creates a new one. This prevents
+// the 'OverwriteModelError'.
+const PropertyDetail = mongoose.models.PropertyDetail || mongoose.model("PropertyDetail", PropertyDetailSchema);
 
 export default PropertyDetail;

@@ -4,16 +4,14 @@ import "./myProperty.css";
 
 function MyProperty() {
   const [properties, setProperties] = useState([]);
-  const [loading,setLoading]=useState(true);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [one, setOne] = useState(false);
   const ownerId = localStorage.getItem("ownerId");
-
-  // console.log(`📤 Fetching from: http://localhost:4000/api/properties/owner/${ownerId}`);
 
   useEffect(() => {
     const fetchProperties = async () => {
       try {
+        // ✅ Use the existing endpoint to fix the 404 error
         const res = await fetch(`http://localhost:4000/api/properties/owner/${ownerId}`);
         if (!res.ok) throw new Error("Failed to fetch properties");
         const data = await res.json();
@@ -22,10 +20,15 @@ function MyProperty() {
       } catch (err) {
         console.error("❌ Error fetching properties:", err.message);
         setProperties([]);
+        setLoading(false); // Also set loading to false on error
       }
     };
 
-    if (ownerId) fetchProperties();
+    if (ownerId) {
+      fetchProperties();
+    } else {
+      setLoading(false); // If no ownerId, stop loading
+    }
   }, [ownerId]);
 
   const gotoprof = () => navigate("/ownprof");
@@ -36,11 +39,8 @@ function MyProperty() {
     return front?.base64 || null;
   };
 
-  const availableRealRooms = properties.filter(p => p.toLet=='Yes');
-  const inactiveRooms = properties.filter(p => p.toLet=='No');
-
-  // console.log("✅ Fetched Properties:", properties);
-  // console.log("🟢 Showing:", availableRealRooms);
+  const availableRealRooms = properties.filter(p => p.toLet === 'Yes');
+  const inactiveRooms = properties.filter(p => p.toLet === 'No');
 
   return (
     <div className="home-page">
@@ -55,22 +55,22 @@ function MyProperty() {
 
       <div className="home-content">
         <h1>Welcome to StayWise</h1>
-        <p>Your Properties (Real & Dummy)</p>
+        <p>Your Properties</p>
       </div>
 
       <div className="prop-container">
         {/* Active Real Properties */}
         <div className="prop-box1">
           <h2 className="tx">Your Active Properties:</h2>
-          {loading?(
+          {loading ? (
             <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
-              {availableRealRooms.length==0?(
+              {availableRealRooms.length === 0 ? (
                 <div className="loader">
-                  No Active Property Currently!
+                  No Active Properties!
                 </div>
-              ):(availableRealRooms.map((room, index) => (
+              ) : (availableRealRooms.map((room, index) => (
                 <div className="room-nbox" key={room._id || index}>
                   <h2>Property {index + 1}</h2>
                   {getFrontImageUrl(room) ? (
@@ -79,10 +79,8 @@ function MyProperty() {
                     <div className="photo placeholder">No Image</div>
                   )}
                   <p><strong>Location:</strong> {room.location?.city}</p>
-                  <p><strong>Total Area:</strong> {room.totalArea}</p>
                   <p><strong>Type:</strong> {room.propertyType}</p>
-                  <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
-
+                  <p><strong>Status:</strong> <span className="status-active">✅ Available</span></p>
                   <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
               )))}
@@ -90,18 +88,18 @@ function MyProperty() {
           )}
         </div>
 
-        {/* All Real Properties */}
+        {/* Inactive Properties */}
         <div className="prop-box1">
-          <h2 className="tx">Inactive Properties:</h2>
-          {loading?(
+          <h2 className="tx">Inactive / Booked Properties:</h2>
+          {loading ? (
             <div className="loader-container"><div className="loader"></div></div>
           ) : (
             <div className="prop-collection">
-              {inactiveRooms.length==0?(
+              {inactiveRooms.length === 0 ? (
                 <div className="load">
-                  No Property Created...
+                  No Inactive Properties.
                 </div>
-              ):(inactiveRooms.map((room, index) => (
+              ) : (inactiveRooms.map((room, index) => (
                 <div className="room-nbox" key={room._id || index}>
                   <h2>Property {index + 1}</h2>
                   {getFrontImageUrl(room) ? (
@@ -110,9 +108,18 @@ function MyProperty() {
                     <div className="photo placeholder">No Image</div>
                   )}
                   <p><strong>Location:</strong> {room.location?.city}</p>
-                  <p><strong>Total Area:</strong> {room.totalArea}</p>
                   <p><strong>Type:</strong> {room.propertyType}</p>
-                  <p><strong>Rental Status:</strong> {room.toLet === "Yes" ? "✅ To-Let" : "❌ Not To-Let"}</p>
+                  <p><strong>Status:</strong> <span className="status-inactive">❌ Booked</span></p>
+
+                  {/* ✅ Display booking information if it exists */}
+                  {room.bookedBy ? (
+                    <div className="booked-by-info">
+                      <p><strong>Booked By:</strong> {room.bookedBy.name}</p>
+                      <p><strong>Contact:</strong> {room.bookedBy.email}</p>
+                    </div>
+                  ) : (
+                    <p><strong>Booked By:</strong> Info Unavailable</p>
+                  )}
 
                   <button onClick={() => navigate(`/property/${room._id}`)}>View</button>
                 </div>
